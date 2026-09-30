@@ -186,6 +186,14 @@
   .result-ev.win { background:rgba(240,178,60,0.12); color:var(--gold); }
   .result-ev.lose { background:rgba(134,149,179,0.14); color:var(--haze); }
   .result-detail { font-weight:400; opacity:.85; }
+  .card-block { display:flex; flex-direction:column; }
+  .manual-result { margin-top:-6px; padding:10px 12px; border:1px dashed var(--rail); border-top:none;
+    border-radius:0 0 12px 12px; background:var(--deck); }
+  .manual-label { font-size:10.5px; color:var(--haze); margin-bottom:7px; }
+  .manual-btns { display:flex; flex-wrap:wrap; gap:6px; }
+  .manual-btn { background:none; border:1px solid var(--rail); color:var(--mist); border-radius:999px;
+    padding:5px 12px; font-size:11.5px; font-weight:600; cursor:pointer; }
+  .manual-btn:hover { border-color:var(--tide); color:var(--tide); }
 
   /* ---------- Accueil : hero, KPIs, opportunités, guide ---------- */
   /* Visuel fourni par l'utilisateur (logo BetIA + Raphinha déjà composités) : affiché en entier, pas en
@@ -1132,6 +1140,49 @@ function computeProNoStats(){
   });
   return { favoriWin:favoriWin, favoriTotal:favoriTotal, evWin:evWin, evTotal:evTotal };
 }
+// Validation manuelle de secours : The Odds API ne complète pas toujours /scores/ pour tous les
+// tournois (le tennis notamment, hors gros tournois, remonte souvent une liste vide). Dès qu'un match
+// est verrouillé (90 min après le coup d'envoi) sans résultat automatique, on propose de déclarer le
+// vainqueur soi-même — ça enregistre exactement la même structure `result` qu'une vérification API,
+// donc tout le reste (bandeaux, bilan Journal) fonctionne à l'identique, sans distinction de source.
+function manualResultButtonsHtml(m){
+  if (!isMatchLocked(m)) return "";
+  const t = TRACKED[m.id];
+  if (t && t.checked) return "";
+  const sport = m.sport || "football";
+  const p1Name = sport==="tennis" ? m.player1.name : m.home.name;
+  const p2Name = sport==="tennis" ? m.player2.name : m.away.name;
+  const p1Key = sport==="tennis" ? "p1" : "home";
+  const p2Key = sport==="tennis" ? "p2" : "away";
+  const drawBtn = sport==="football"
+    ? '<button class="manual-btn" data-declare-match="'+m.id+'" data-declare-winner="draw">Match nul</button>' : "";
+  return '<div class="manual-result">'
+    + '<div class="manual-label">Résultat pas encore confirmé par l\'API — déclarer le vainqueur :</div>'
+    + '<div class="manual-btns">'
+      + '<button class="manual-btn" data-declare-match="'+m.id+'" data-declare-winner="'+p1Key+'">'+p1Name+'</button>'
+      + '<button class="manual-btn" data-declare-match="'+m.id+'" data-declare-winner="'+p2Key+'">'+p2Name+'</button>'
+      + drawBtn
+    + '</div></div>';
+}
+function declareManualResult(matchId, winnerKey){
+  let t = TRACKED[matchId];
+  if (!t) return; // le match doit être suivi (déjà passé par trackMatches) pour pouvoir être déclaré
+  t.checked = true;
+  t.result = {
+    winnerKey: winnerKey, manual: true,
+    favoriCorrect: t.favori ? (t.favori.key===winnerKey) : null,
+    evResults: (t.evPicks||[]).map(function(p){ return { key:p.key, label:p.label, correct:p.key===winnerKey }; }),
+  };
+  saveTracked();
+  toast("Résultat déclaré manuellement.");
+  if (openMatchId === matchId) openDrawer(matchId, drawerTab); // rafraîchit le drawer si ouvert sur ce match
+  renderActivePage(false);
+}
+function bindManualResultButtons(root){
+  root.querySelectorAll("[data-declare-match]").forEach(function(btn){
+    btn.onclick = function(e){ e.stopPropagation(); declareManualResult(btn.dataset.declareMatch, btn.dataset.declareWinner); };
+  });
+}
 
 /* =========================================================================
    4. ÉTAT
@@ -1155,8 +1206,10 @@ function matchStatus(m){
   const kickoff = new Date(m.kickoff).getTime();
   const nowMs = Date.now();
   if (nowMs < kickoff) return "upcoming";
-  const sport = m.sport || "football";
-  const liveWindowMs = sport==="tennis" ? (m.bestOf===5 ? 5*3600000 : 3*3600000) : 2*3600000;
+  // Fenêtre volontairement courte : au-delà de 90 min après le coup d'envoi, on considère le match
+  // "terminé" et on tente activement la vérification du score, plutôt que d'attendre une durée théorique
+  // (2h foot / 3-5h tennis) qui retardait inutilement l'affichage du résultat.
+  const liveWindowMs = 1.5 * 3600000;
   return (nowMs - kickoff <= liveWindowMs) ? "live" : "finished";
 }
 function isMatchLocked(m){ const st = matchStatus(m); return st==="finished" || st==="cancelled"; }
@@ -1447,16 +1500,19 @@ function cardHtml(m){
   else if (locked) pill = '<div class="ai-pill muted">'+(matchStatus(m)==="cancelled"?"Match annulé — cotes verrouillées":"Match terminé — cotes verrouillées, résultat pas encore vérifié")+'</div>';
   else if (oppCount>0) pill = '<div class="ai-pill has">'+sparkle+oppCount+' opportunité'+(oppCount>1?"s":"")+' détectée'+(oppCount>1?"s":"")+'</div>';
   else pill = '<div class="ai-pill muted">Analyse IA disponible</div>';
-  return '<article class="card" data-id="'+m.id+'" tabindex="0" role="button" aria-label="Voir l\'analyse complète de ce match">'
-    + '<div class="card-head"><div class="left">'+leftHead+'</div>'
-      + '<div class="right-meta">'+statusPillHtml(m)+'<time class="tnum">'+fmtTime(m.kickoff)+'</time></div></div>'
-    + resultHtml
-    + (sport==="tennis" ? tennisHeaderHtml(m) : footballHeaderHtml(m))
-    + oddsRowHtml(h2hSel)
-    + pill
-    + '<div class="open-btn" aria-hidden="true">Voir l\'analyse complète &amp; les probabilités'
-      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>'
-    + '</article>';
+  return '<div class="card-block">'
+    + '<article class="card" data-id="'+m.id+'" tabindex="0" role="button" aria-label="Voir l\'analyse complète de ce match">'
+      + '<div class="card-head"><div class="left">'+leftHead+'</div>'
+        + '<div class="right-meta">'+statusPillHtml(m)+'<time class="tnum">'+fmtTime(m.kickoff)+'</time></div></div>'
+      + resultHtml
+      + (sport==="tennis" ? tennisHeaderHtml(m) : footballHeaderHtml(m))
+      + oddsRowHtml(h2hSel)
+      + pill
+      + '<div class="open-btn" aria-hidden="true">Voir l\'analyse complète &amp; les probabilités'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>'
+    + '</article>'
+    + manualResultButtonsHtml(m)
+  + '</div>';
 }
 
 /* =========================================================================
@@ -1534,6 +1590,7 @@ function renderMatchesPage(){
     el.onclick = function(){ openDrawer(el.dataset.id); };
     el.onkeydown = function(e){ if (e.key==="Enter" || e.key===" "){ e.preventDefault(); openDrawer(el.dataset.id); } };
   });
+  bindManualResultButtons(cardsEl);
 }
 
 /* =========================================================================
@@ -1707,6 +1764,7 @@ function renderJournalPage(){
     cardEl.onclick = function(){ openDrawer(cardEl.dataset.id); };
     cardEl.onkeydown = function(e){ if (e.key==="Enter" || e.key===" "){ e.preventDefault(); openDrawer(cardEl.dataset.id); } };
   });
+  bindManualResultButtons(el);
   el.querySelectorAll("[data-status]").forEach(function(b){ b.onclick = function(){ setBetStatus(b.dataset.bet, b.dataset.status); }; });
   el.querySelectorAll("[data-remove]").forEach(function(b){ b.onclick = function(){ removeBet(b.dataset.remove); }; });
 }
@@ -1893,8 +1951,10 @@ function drawerHtml(m){
     + '<div class="drawer-status"><span class="status-dot '+meta.cls+'"></span><span class="status-txt '+meta.cls+'">'+meta.label+'</span></div>'
     + '<h2 id="drawerTitle">'+title+'</h2>'
     + '<p class="sub">'+subtitle+'</p>'
+    + resultBannerHtml(m)
     + tabsBarHtml(drawerTab, "drawer", sport)
     + '<div id="drawerBody">' + drawerBodyHtml(m) + '</div>'
+    + manualResultButtonsHtml(m)
     + '<div class="drawer-sticky-footer"><button class="back-btn-full" id="backBtnBottom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg><span>Retour aux matchs</span></button></div>';
 }
 
@@ -1918,6 +1978,7 @@ function bindDrawerEvents(m){
     renderJournalBadge();
   };
   bindTrackButtons(document.getElementById("drawer"));
+  bindManualResultButtons(document.getElementById("drawer"));
 }
 
 function refreshDrawer(){
