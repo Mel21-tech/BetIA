@@ -902,7 +902,7 @@ function normalizeOddsApiFootballEvent(event){
     kickoff: event.commence_time, homeName: event.home_team, awayName: event.away_team,
     home: neutralFootballProfile(1.08), away: neutralFootballProfile(1.0),
     oddsH2H: { home: home, draw: draw, away: away },
-    factors: [], dataQuality: 0.50,
+    factors: [], dataQuality: 1.0, // cotes réellement récupérées depuis The Odds API : qualité de donnée maximale
   });
   // Conservés pour interroger plus tard l'endpoint /scores/ de The Odds API avec le bon sport_key et
   // retrouver cet évènement précis dans la réponse (même id que l'endpoint odds, sans notre préfixe).
@@ -920,7 +920,25 @@ function normalizeOddsApiTennisEvent(event){
     p1: neutralTennisProfile(), p2: neutralTennisProfile(), conf:50,
     oddsH2H: { p1: p1, p2: p2 },
     headToHead: { overall:"Non renseigné (source : cotes uniquement)", surface:"—", recent:[] },
-    dataQuality: 0.50,
+    dataQuality: 1.0, // cotes réellement récupérées depuis The Odds API : qualité de donnée maximale
+  });
+  // Sans flux de statistiques de service/retour individuelles en direct, donner exactement le même
+  // profil neutre aux deux joueurs fait mécaniquement ressortir le modèle point par point à ~50/50,
+  // quel que soit l'écart réel de niveau (ex. cotes 1,12 / 5,70) — c'est faux et trompeur à l'affichage.
+  // Exception assumée et documentée à la règle générale du moteur : pour le seul marché vainqueur du
+  // match d'un match sourcé API tennis, la probabilité est recalculée par dé-margination directe du
+  // marché (P(A) = 1/cote_A / (1/cote_A + 1/cote_B)) plutôt que reprise du point par point neutre — un
+  // favori écrasant au marché ressort donc bien écrasant au modèle. Les autres marchés (sets, jeux...)
+  // restent ceux, non recalibrés, du moteur point par point neutre.
+  const impliedP1 = 1/avgOdds(p1.byBook), impliedP2 = 1/avgOdds(p2.byBook);
+  const devP1 = impliedP1/(impliedP1+impliedP2), devP2 = 1-devP1;
+  m.selections.forEach(function(s){
+    if (s.market==="h2h"){
+      s.pModel = s.key==="p1" ? devP1 : devP2;
+      s.edge = s.pModel - s.pMarket;
+      s.ev = s.pModel*s.bestOdds - 1;
+      s.kelly = kellyCalc(s.pModel, s.bestOdds);
+    }
   });
   m.apiEventId = event.id; m.apiSportKey = event.sport_key;
   return m;
@@ -1034,12 +1052,30 @@ function trackMatches(){
 }
 // Vainqueur réel à partir du tableau `scores` renvoyé par l'API ([{name, score}, ...]) — "home"/"away"
 // pour le foot (ou "draw"), "p1"/"p2" pour le tennis (pas d'égalité possible).
+// Comparaison de noms tolérante : l'orthographe exacte, l'ordre nom/prénom ou l'ajout d'initiales peut
+// différer légèrement entre l'endpoint odds et l'endpoint scores (surtout au tennis, ex. "Struff" vs
+// "J-L Struff" vs "Struff J.L."). On tente une égalité stricte, puis une inclusion dans un sens ou
+// l'autre, puis en dernier recours la comparaison du seul dernier mot (nom de famille probable).
+function normNameForMatch(s){ return String(s||"").toLowerCase().trim(); }
+function findScoreEntry(scores, name){
+  const target = normNameForMatch(name);
+  let hit = scores.find(function(s){ return normNameForMatch(s.name)===target; });
+  if (hit) return hit;
+  hit = scores.find(function(s){
+    const n = normNameForMatch(s.name);
+    return n.includes(target) || target.includes(n);
+  });
+  if (hit) return hit;
+  const targetLast = target.split(" ").pop();
+  hit = scores.find(function(s){ return normNameForMatch(s.name).split(" ").pop()===targetLast; });
+  return hit || null;
+}
 function computeWinnerKey(t, scores){
   const m = t.match, sport = t.sport;
   const nameHome = sport==="tennis" ? m.player1.name : m.home.name;
   const nameAway = sport==="tennis" ? m.player2.name : m.away.name;
-  const sHome = scores.find(function(s){ return s.name===nameHome; });
-  const sAway = scores.find(function(s){ return s.name===nameAway; });
+  const sHome = findScoreEntry(scores, nameHome);
+  const sAway = findScoreEntry(scores, nameAway);
   if (!sHome || !sAway) return null;
   const hv = Number(sHome.score), av = Number(sAway.score);
   if (isNaN(hv) || isNaN(av)) return null;
@@ -1143,11 +1179,14 @@ function isVal(s, m){
 function currentMatches(){
   const live = UPCOMING[state.sport] || [];
   const liveIds = {}; live.forEach(function(m){ liveIds[m.id] = true; });
-  const finished = Object.keys(TRACKED)
+  // Tout match suivi (pas seulement ceux déjà vérifiés) reste affiché dès qu'il quitte la liste "upcoming" :
+  // sinon un match terminé mais pas encore vérifié (résultat pas encore publié côté API) disparaîtrait
+  // purement et simplement pendant la fenêtre où il est "terminé mais pas confirmé".
+  const tracked = Object.keys(TRACKED)
     .map(function(id){ return TRACKED[id]; })
-    .filter(function(t){ return t && t.sport===state.sport && t.checked && !liveIds[t.match.id]; })
+    .filter(function(t){ return t && t.sport===state.sport && !liveIds[t.match.id]; })
     .map(function(t){ return t.match; });
-  return live.concat(finished);
+  return live.concat(tracked);
 }
 function topPick(m){
   const vals = m.selections.filter(function(s){ return isVal(s, m); });
@@ -1630,6 +1669,12 @@ function renderPepites(){
 function renderJournalPage(){
   const s = journalStats();
   const p = computeProNoStats();
+  const recentFinished = Object.keys(TRACKED)
+    .map(function(id){ return TRACKED[id]; })
+    .filter(function(t){ return t && isMatchLocked(t.match); })
+    .sort(function(a,b){ return b.match.kickoff.localeCompare(a.match.kickoff); })
+    .slice(0, 15)
+    .map(function(t){ return t.match; });
   const el = document.getElementById("pageJournal");
   el.innerHTML = '<h1 class="page-title">Mon journal de paris</h1>'
     + '<p class="page-sub">Historique local de vos paris suivis — stocké uniquement dans ce navigateur.</p>'
@@ -1642,6 +1687,11 @@ function renderJournalPage(){
       + '</div>'
       + (p.favoriTotal===0 ? '<p class="tab-empty">Aucun match vérifié pour l\'instant — revient une fois que des rencontres suivies seront terminées.</p>' : '')
     + '</section>'
+    + '<section class="home-section"><h2>Matchs terminés suivis</h2>'
+      + (recentFinished.length
+          ? '<div class="cards">' + recentFinished.map(cardHtml).join("") + '</div>'
+          : '<p class="tab-empty">Aucun match terminé suivi pour l\'instant.</p>')
+    + '</section>'
     + '<section class="home-section"><h2>Mes paris suivis</h2>'
     + '<div class="journal-summary">'
       + '<div class="jstat"><span class="jval '+(s.profit>=0?"pos":"neg")+' tnum">'+fmtEur(s.profit)+'</span><span class="jlabel">Profit / Perte</span></div>'
@@ -1653,6 +1703,10 @@ function renderJournalPage(){
       ? '<p class="tab-empty">Aucun pari suivi pour l\'instant. Depuis l\'analyse d\'un match, clique sur « Suivre » à côté d\'un pari value pour l\'ajouter ici.</p>'
       : '<div class="bet-list">' + journal.map(betRowHtml).join("") + '</div>')
     + '</section>';
+  el.querySelectorAll(".cards .card").forEach(function(cardEl){
+    cardEl.onclick = function(){ openDrawer(cardEl.dataset.id); };
+    cardEl.onkeydown = function(e){ if (e.key==="Enter" || e.key===" "){ e.preventDefault(); openDrawer(cardEl.dataset.id); } };
+  });
   el.querySelectorAll("[data-status]").forEach(function(b){ b.onclick = function(){ setBetStatus(b.dataset.bet, b.dataset.status); }; });
   el.querySelectorAll("[data-remove]").forEach(function(b){ b.onclick = function(){ removeBet(b.dataset.remove); }; });
 }
