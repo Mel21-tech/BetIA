@@ -1,3 +1,6 @@
+(Aucun objet)
+Melvyn Clouzet
+vous
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -390,6 +393,64 @@
   .limit-bar { height:8px; border-radius:999px; background:var(--rail); overflow:hidden; }
   .limit-bar-fill { height:100%; background:var(--tide); border-radius:999px; }
   .limit-bar-fill.over { background:var(--ember); }
+  /* ---------- Indice de confiance ---------- */
+  .conf-stars { display:inline-flex; align-items:center; gap:1px; font-size:12px; letter-spacing:1px; }
+  .conf-stars .on { color:var(--gold); }
+  .conf-stars .off { color:var(--rail); }
+  .conf-label { font-size:11px; font-weight:700; color:var(--mist); margin-left:8px; letter-spacing:0; }
+  .conf-box { border:1px solid var(--rail); border-radius:12px; padding:9px 12px; margin:0 0 12px; }
+  .conf-box .conf-stars { font-size:16px; }
+  .conf-reasons { margin:6px 0 0; padding-left:16px; font-size:11px; color:var(--haze); }
+  .secure-pick-stars { margin-top:3px; }
+  /* ---------- Comparateur ---------- */
+  .table-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .comparator { width:100%; border-collapse:collapse; font-size:12px; min-width:320px; }
+  .comparator th, .comparator td { padding:7px 6px; border-bottom:1px solid var(--rail); text-align:left; }
+  .comparator th { font-size:10.5px; color:var(--haze); font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+  .comparator .r { text-align:right; }
+  .comparator .muted { color:var(--haze); }
+  .comparator .best-odds { color:#22c55e; font-weight:800; background:rgba(34,197,94,0.10); border-radius:6px; }
+  .comparator .margin-row td { font-size:11px; color:var(--haze); }
+  .comparator .link-row td { border-bottom:none; }
+  /* ---------- Calculateur ---------- */
+  .calc-grid { display:grid; gap:10px; grid-template-columns:1fr; }
+  @media (min-width:560px){ .calc-grid { grid-template-columns:1.4fr 1fr 1fr; } }
+  .calc-field { display:flex; flex-direction:column; gap:5px; font-size:11px; color:var(--haze); }
+  .calc-field select, .calc-field input { background:var(--abyss); border:1px solid var(--rail); border-radius:8px; color:var(--mist); padding:8px 10px; font-size:13px; width:100%; }
+  .calc-mode { display:flex; gap:6px; }
+  .calc-mode .chip { flex:1; }
+  .calc-result { margin-top:12px; border:1px solid var(--rail); border-radius:12px; padding:10px 12px; background:rgba(91,196,230,0.04); }
+  .calc-line { display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:3px 0; }
+  .calc-line .muted { color:var(--haze); font-weight:400; font-size:11px; }
+  .calc-line.big { font-size:14px; border-top:1px solid var(--rail); margin-top:4px; padding-top:7px; }
+  .calc-line .pos { color:#22c55e; } .calc-line .neg { color:#ff8890; }
+  .calc-warn { margin-top:8px; font-size:11.5px; color:var(--gold); }
+  /* ---------- Live ---------- */
+  .section-label { font-size:11px; font-weight:800; color:var(--haze); text-transform:uppercase; letter-spacing:.05em; margin:4px 2px -4px; }
+  .section-label.live { color:var(--ember); }
+  .live-box { border:1px solid rgba(226,96,107,0.45); background:rgba(226,96,107,0.06); border-radius:12px; padding:10px 12px; margin-bottom:10px; }
+  .live-head { display:flex; align-items:center; gap:6px; font-size:10.5px; font-weight:800; color:var(--ember); letter-spacing:.06em; margin-bottom:6px; }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:var(--ember); animation:livePulse 1.2s ease-in-out infinite; }
+  @keyframes livePulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.8); } }
+  .live-score { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; font-size:12.5px; margin-bottom:6px; }
+  .live-score span:last-child { text-align:right; }
+  .live-score b { font-size:20px; font-weight:800; }
+  .live-score.muted { display:block; color:var(--haze); font-size:11.5px; }
+  .live-progress { height:5px; border-radius:999px; background:var(--rail); overflow:hidden; }
+  .live-progress span { display:block; height:100%; background:var(--ember); transition:width .6s ease; }
+  .live-meta { font-size:11px; color:var(--mist); margin-top:4px; }
+  .live-meta .muted, .live-odds .muted { color:var(--haze); }
+  .live-alert { margin-top:8px; font-size:12px; font-weight:700; color:var(--gold); background:rgba(240,178,60,0.12); border-radius:8px; padding:6px 9px; }
+  .live-odds { margin-top:6px; font-size:11.5px; color:var(--mist); }
+  .live-odds .up { color:#ff8890; } .live-odds .down { color:#22c55e; } .live-odds .flat { color:var(--mist); }
+  .live-note { margin-top:6px; font-size:10px; color:var(--haze); }
+  @media (prefers-reduced-motion: reduce){ .live-dot { animation:none; } }
+  /* ---------- Bankroll ---------- */
+  .bank-kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:10px; }
+  .bank-kpis div { border:1px solid var(--rail); border-radius:10px; padding:8px 10px; display:flex; flex-direction:column; gap:2px; }
+  .bank-kpis span { font-size:10.5px; color:var(--haze); }
+  .bank-kpis b { font-size:13px; }
+  .bank-kpis .pos { color:#22c55e; } .bank-kpis .neg { color:#ff8890; }
   .kelly-item .left { min-width:0; }
   .kelly-item b { color:var(--gold); }
   .kelly-item .frac { font-weight:400; color:var(--haze); }
@@ -1476,7 +1537,14 @@ function trackMatches(){
     (UPCOMING[sport]||[]).forEach(function(m){
       const prev = TRACKED[m.id];
       const kickoffPassed = Date.now() >= new Date(m.kickoff).getTime();
-      if (prev && kickoffPassed) return; // déjà figé au coup d'envoi : on ne touche plus à match
+      if (prev && kickoffPassed) {
+        // Déjà figé au coup d'envoi : le match et le prono ne bougent plus. On relève seulement, à part,
+        // les cotes live actuelles pour afficher leur mouvement dans le module En direct.
+        const live = {};
+        m.selections.forEach(function(s){ if (s.market==="h2h") live[s.key] = s.bestOdds; });
+        prev.liveOdds = live; prev.liveOddsAt = Date.now();
+        return;
+      }
       TRACKED[m.id] = {
         match: m, sport: sport,
         checked: prev ? prev.checked : false, result: prev ? prev.result : null,
@@ -1531,7 +1599,8 @@ function computeWinnerKey(t, scores){
 async function checkPendingResults(){
   const pendingIds = Object.keys(TRACKED).filter(function(id){
     const t = TRACKED[id];
-    return t && !t.checked && isMatchLocked(t.match);
+    // Tout match commencé et pas encore vérifié : sert à la fois à la vérification finale et au score live.
+    return t && !t.checked && Date.now() >= new Date(t.match.kickoff).getTime();
   });
   if (!pendingIds.length) return;
   const bySport = {};
@@ -1552,7 +1621,16 @@ async function checkPendingResults(){
     bySport[sk].forEach(function(id){
       const t = TRACKED[id];
       const ev = events.find(function(e){ return e.id === t.match.apiEventId; });
-      if (!ev || !ev.completed || !ev.scores) return;
+      if (!ev || !ev.scores) return;
+      if (!ev.completed) {
+        // Match en cours : on garde le score live (module En direct), sans rien valider.
+        const nH = t.sport==="tennis" ? t.match.player1.name : t.match.home.name;
+        const nA = t.sport==="tennis" ? t.match.player2.name : t.match.away.name;
+        const sH = findScoreEntry(ev.scores, nH), sA = findScoreEntry(ev.scores, nA);
+        if (sH && sA) t.liveScore = { home:sH.score, away:sA.score, completed:false, updatedAt:Date.now() };
+        return;
+      }
+      t.liveScore = null;
       const winnerKey = computeWinnerKey(t, ev.scores);
       if (!winnerKey) return;
       t.checked = true;
@@ -2110,6 +2188,7 @@ function cardHtml(m){
         + '<span class="secure-pick-label">'+(isSecure?"🟢 Prono sécurisé":"🟠 Léger favori (Match indécis)")+pendingLabel+'</span>'
         + '<span class="secure-pick-main">'+secure.label+' <b class="tnum">'+fmtPct(secure.pModel)+'</b></span>'
         + '<span class="secure-pick-book">Meilleure cote '+fmtOdds(secure.bestOdds)+' · '+secure.bestBookmaker+(isSecure?'':' (mise déconseillée)')+'</span>'
+        + '<span class="secure-pick-stars">'+starsHtml(m)+'</span>'
         + (locked ? '' : '<button class="combo-add-btn" data-combo-add="'+m.id+'">+ Combiné</button>')
       + '</div>';
     }
@@ -2125,6 +2204,7 @@ function cardHtml(m){
       + '<div class="card-head"><div class="left">'+leftHead+'</div>'
         + '<div class="right-meta">'+statusPillHtml(m)+'<time class="tnum">'+fmtTime(m.kickoff)+'</time></div></div>'
       + resultHtml
+      + liveBlockHtml(m)
       + secureHtml
       + (sport==="tennis" ? tennisHeaderHtml(m) : footballHeaderHtml(m))
       + oddsRowHtml(h2hSel)
@@ -2180,7 +2260,8 @@ function matchMatchesSearch(m){
 }
 function matchQualifies(m){
   if (state.comp !== "all" && m.competition.key !== state.comp) return false;
-  const finished = isMatchLocked(m);
+  // Un match encore en cours selon le score live reste dans "À venir & en direct", même passé 90 min.
+  const finished = isMatchLocked(m) && !isInPlay(m);
   if (state.matchesFilter==="finished" && !finished) return false;
   if (state.matchesFilter==="live" && finished) return false;
   return matchMatchesSearch(m);
@@ -2215,6 +2296,10 @@ function renderMatchesPage(){
       emptyMsg = "Aucun match ne correspond à cette recherche ou ce filtre.";
     }
     cardsEl.innerHTML = '<div class="empty">'+emptyMsg+'</div>';
+  } else if (state.matchesFilter==="live") {
+    const liveList = list.filter(isInPlay), nextList = list.filter(function(m){ return !isInPlay(m); });
+    cardsEl.innerHTML = (liveList.length ? '<div class="section-label live">🔴 En direct ('+liveList.length+')</div>' + liveList.map(cardHtml).join("") : "")
+      + (nextList.length ? (liveList.length ? '<div class="section-label">À venir</div>' : '') + nextList.map(cardHtml).join("") : "");
   } else {
     cardsEl.innerHTML = list.map(cardHtml).join("");
   }
@@ -2511,6 +2596,273 @@ function generateCoachAnalysis(m){
     + '</div>';
 }
 
+/* =========================================================================
+   MODULE A — INDICE DE CONFIANCE GLOBAL (1 à 5 ⭐)
+   Calculé uniquement à partir de données réelles : la probabilité du prono
+   (pModel), le nombre de bookmakers qui cotent la sélection et l'écart entre
+   leurs prix (un marché où les opérateurs sont d'accord est plus stable).
+   ========================================================================= */
+function confidenceIndex(m){
+  const secure = securePickOf(m);
+  if (!secure) return { stars:1, reasons:["Aucune sélection exploitable"] };
+  const p = secure.pModel;
+  let stars = p>=SECURE_STRONG_THRESHOLD ? 5 : p>=SECURE_THRESHOLD ? 4 : p>=0.60 ? 3 : p>=0.50 ? 2 : 1;
+  const reasons = ["Probabilité du prono : "+fmtPct(p)];
+  const prices = Object.values(secure.oddsByBook||{}).filter(function(x){ return x>1; });
+  if (prices.length < 2) {
+    stars = Math.max(1, stars-1);
+    reasons.push("Un seul bookmaker cote cette sélection (−1 ⭐)");
+  } else {
+    const spread = (Math.max.apply(null,prices) - Math.min.apply(null,prices)) / Math.min.apply(null,prices);
+    if (spread > 0.06) { stars = Math.max(1, stars-1); reasons.push("Bookmakers en désaccord : écart de "+(spread*100).toFixed(1).replace(".",",")+" % (−1 ⭐)"); }
+    else reasons.push(prices.length+" bookmakers alignés (écart "+(spread*100).toFixed(1).replace(".",",")+" %)");
+  }
+  return { stars:stars, reasons:reasons };
+}
+function starsHtml(m, withLabel){
+  const ci = confidenceIndex(m);
+  let s = "";
+  for (let i=1;i<=5;i++) s += '<span class="'+(i<=ci.stars?"on":"off")+'">★</span>';
+  return '<span class="conf-stars" title="'+ci.reasons.join(" · ").replace(/"/g,"&quot;")+'" aria-label="Indice de confiance '+ci.stars+' sur 5">'
+    + s + (withLabel ? '<span class="conf-label">Indice de confiance '+ci.stars+'/5</span>' : '') + '</span>';
+}
+function confidenceDetailHtml(m){
+  const ci = confidenceIndex(m);
+  return '<div class="conf-box">'+starsHtml(m, true)
+    + '<ul class="conf-reasons">'+ci.reasons.map(function(r){ return '<li>'+r+'</li>'; }).join("")+'</ul></div>';
+}
+
+/* =========================================================================
+   MODULE B — COMPARATEUR DE COTES MULTI-BOOKMAKERS (Drawer)
+   Les vrais prix par opérateur (oddsByBook), meilleure cote surlignée, marge
+   réelle de chaque bookmaker sur le marché (somme des probabilités − 100 %).
+   ========================================================================= */
+const COMPARATOR_BOOKS = ["Winamax","Betclic","Unibet"];
+function oddsComparatorHtml(m){
+  const sport = m.sport || "football";
+  const order = sport==="tennis" ? ["p1","p2"] : ["home","draw","away"];
+  const sels = order.map(function(k){ return m.selections.find(function(s){ return s.market==="h2h" && s.key===k; }); }).filter(Boolean);
+  if (!sels.length) return "";
+  const head = '<tr><th>Sélection</th>'+COMPARATOR_BOOKS.map(function(b){ return '<th class="r">'+b+'</th>'; }).join("")+'</tr>';
+  const rows = sels.map(function(s){
+    const byBook = s.oddsByBook || {};
+    const max = Math.max.apply(null, COMPARATOR_BOOKS.map(function(b){ return byBook[b]||0; }));
+    return '<tr><td>'+s.label+'</td>'+COMPARATOR_BOOKS.map(function(b){
+      const v = byBook[b];
+      if (!v) return '<td class="r muted">—</td>';
+      return '<td class="r tnum'+(v===max?' best-odds':'')+'">'+fmtOdds(v)+'</td>';
+    }).join("")+'</tr>';
+  }).join("");
+  const margins = '<tr class="margin-row"><td>Marge bookmaker</td>'+COMPARATOR_BOOKS.map(function(b){
+    const prices = sels.map(function(s){ return (s.oddsByBook||{})[b]; });
+    if (prices.some(function(v){ return !v; })) return '<td class="r muted">—</td>';
+    const over = prices.reduce(function(a,v){ return a+1/v; },0) - 1;
+    return '<td class="r tnum">'+(over*100).toFixed(1).replace(".",",")+' %</td>';
+  }).join("")+'</tr>';
+  const links = '<tr class="link-row"><td></td>'+COMPARATOR_BOOKS.map(function(b){
+    const quoted = sels.some(function(s){ return (s.oddsByBook||{})[b]; });
+    return '<td class="r">'+(quoted ? bookmakerLinkHtml(b) : '')+'</td>';
+  }).join("")+'</tr>';
+  return '<section><h3>Comparateur de cotes</h3>'
+    + '<p style="font-size:11px;color:var(--haze);margin:0 0 8px;">Prix réels relevés chez chaque opérateur pour le vainqueur du match. En vert : la meilleure cote du marché. Plus la marge est basse, plus l\'opérateur rémunère bien ce match.</p>'
+    + '<div class="table-scroll"><table class="tnum comparator">'+'<thead>'+head+'</thead><tbody>'+rows+margins+links+'</tbody></table></div>'
+    + '<p style="font-size:10.5px;color:var(--haze);margin:6px 0 0;">Les liens ouvrent la page paris sportifs de l\'opérateur (pas de lien direct vers le pari précis).</p>'
+    + '</section>';
+}
+
+/* =========================================================================
+   MODULE C — CALCULATEUR DE MISE DYNAMIQUE (Drawer)
+   ========================================================================= */
+function stakeCalculatorHtml(m){
+  if (isMatchLocked(m)) return "";
+  const sport = m.sport || "football";
+  const order = sport==="tennis" ? ["p1","p2"] : ["home","draw","away"];
+  const sels = order.map(function(k){ return m.selections.find(function(s){ return s.market==="h2h" && s.key===k; }); }).filter(Boolean);
+  if (!sels.length) return "";
+  const secure = securePickOf(m);
+  const defFrac = secure ? secureStakeFraction(secure.pModel) : 0;
+  return '<section><h3>Calculateur de mise</h3>'
+    + '<div class="calc-grid">'
+      + '<label class="calc-field"><span>Sélection</span><select id="calcSel">'
+        + sels.map(function(s){ return '<option value="'+s.id+'"'+(secure && s.id===secure.id?' selected':'')+'>'+s.label+' — '+fmtOdds(s.bestOdds)+' ('+s.bestBookmaker+')</option>'; }).join("")
+      + '</select></label>'
+      + '<div class="calc-field"><span>Mode</span><div class="calc-mode">'
+        + '<button class="chip" id="calcModePct" aria-pressed="true">% bankroll</button>'
+        + '<button class="chip" id="calcModeEur" aria-pressed="false">Montant €</button></div></div>'
+      + '<label class="calc-field"><span id="calcInputLabel">Pourcentage de la bankroll</span>'
+        + '<input type="number" id="calcInput" min="0" step="0.5" value="'+(defFrac>0?defFrac*100:1)+'" inputmode="decimal"></label>'
+    + '</div>'
+    + '<div class="calc-result" id="calcResult"></div>'
+    + '</section>';
+}
+function bindStakeCalculator(m){
+  const selEl = document.getElementById("calcSel");
+  if (!selEl) return;
+  const input = document.getElementById("calcInput");
+  let mode = "pct";
+  function compute(){
+    const s = m.selections.find(function(x){ return x.id===selEl.value; });
+    if (!s) return;
+    const v = Math.max(0, Number(input.value)||0);
+    const stake = mode==="pct" ? state.bankroll*v/100 : v;
+    const pctOfBank = state.bankroll>0 ? stake/state.bankroll : 0;
+    const net = stake*(s.bestOdds-1);
+    const warn = pctOfBank > 0.05 ? '<div class="calc-warn">⚠️ Mise supérieure à 5 % de ta bankroll : risque élevé.</div>' : '';
+    document.getElementById("calcResult").innerHTML =
+        '<div class="calc-line"><span>Mise</span><b class="tnum">'+fmtEur(stake)+' <span class="muted">('+fmtPct(pctOfBank)+' de la bankroll)</span></b></div>'
+      + '<div class="calc-line"><span>Cote ('+s.bestBookmaker+')</span><b class="tnum">'+fmtOdds(s.bestOdds)+'</b></div>'
+      + '<div class="calc-line"><span>Retour total si gagné</span><b class="tnum">'+fmtEur(stake*s.bestOdds)+'</b></div>'
+      + '<div class="calc-line big"><span>Gain net si gagné</span><b class="tnum pos">+'+fmtEur(net)+'</b></div>'
+      + '<div class="calc-line"><span>Perte si perdu</span><b class="tnum neg">−'+fmtEur(stake)+'</b></div>'
+      + '<div class="calc-line"><span>Probabilité modèle</span><b class="tnum">'+fmtPct(s.pModel)+'</b></div>'
+      + warn;
+  }
+  function setMode(newMode){
+    const s = m.selections.find(function(x){ return x.id===selEl.value; });
+    const cur = Math.max(0, Number(input.value)||0);
+    if (newMode!==mode) input.value = newMode==="eur" ? (state.bankroll*cur/100).toFixed(2) : (state.bankroll>0 ? (cur/state.bankroll*100).toFixed(2) : 0);
+    mode = newMode;
+    document.getElementById("calcModePct").setAttribute("aria-pressed", String(mode==="pct"));
+    document.getElementById("calcModeEur").setAttribute("aria-pressed", String(mode==="eur"));
+    document.getElementById("calcInputLabel").textContent = mode==="pct" ? "Pourcentage de la bankroll" : "Montant de la mise (€)";
+    input.step = mode==="pct" ? "0.5" : "1";
+    compute();
+  }
+  document.getElementById("calcModePct").onclick = function(e){ e.preventDefault(); setMode("pct"); };
+  document.getElementById("calcModeEur").onclick = function(e){ e.preventDefault(); setMode("eur"); };
+  selEl.onchange = compute;
+  input.oninput = compute;
+  compute();
+}
+
+/* =========================================================================
+   MODULE D — MODE LIVE / EN DIRECT
+   Score réel via /scores/ de The Odds API (mêmes appels que la vérification
+   des résultats, rafraîchi à chaque actualisation), cotes live relevées sans
+   jamais toucher au prono figé au coup d'envoi. Pas d'EV live : le modèle est
+   pré-match, l'appliquer à des cotes en cours de match donnerait de fausses
+   values (ex. favori mené → cote qui explose → fausse "value" énorme).
+   ========================================================================= */
+function isInPlay(m){
+  const t = TRACKED[m.id];
+  if (t && t.checked) return false;
+  if (m.cancelled) return false;
+  const elapsed = Date.now() - new Date(m.kickoff).getTime();
+  if (elapsed < 0) return false;
+  if (t && t.liveScore) {
+    if (t.liveScore.completed) return false;
+    const maxMs = (m.sport==="tennis" ? 5 : 2.75) * 3600000;
+    return elapsed < maxMs;
+  }
+  return matchStatus(m)==="live";
+}
+function liveScoreLabel(m){
+  const t = TRACKED[m.id];
+  if (!t || !t.liveScore) return null;
+  return { home:t.liveScore.home, away:t.liveScore.away };
+}
+function liveBlockHtml(m){
+  if (!isInPlay(m)) return "";
+  const sport = m.sport || "football";
+  const t = TRACKED[m.id] || {};
+  const homeName = sport==="tennis" ? m.player1.name : m.home.name;
+  const awayName = sport==="tennis" ? m.player2.name : m.away.name;
+  const sc = liveScoreLabel(m);
+  const elapsedMin = Math.max(0, Math.floor((Date.now()-new Date(m.kickoff).getTime())/60000));
+  let progress = "";
+  if (sport==="football") {
+    // Estimation : 45 min + ~15 min de mi-temps + 45 min. Indicatif, l'API ne fournit pas la minute exacte.
+    const playMin = elapsedMin<=45 ? elapsedMin : elapsedMin<=60 ? 45 : Math.min(90, elapsedMin-15);
+    const phase = elapsedMin<=45 ? "1re mi-temps" : elapsedMin<=60 ? "Mi-temps (estimée)" : elapsedMin<=105 ? "2e mi-temps" : "Temps additionnel / fin";
+    progress = '<div class="live-progress"><span style="width:'+Math.min(100, playMin/90*100).toFixed(1)+'%"></span></div>'
+      + '<div class="live-meta">~'+playMin+'\' · '+phase+' <span class="muted">(estimation depuis le coup d\'envoi)</span></div>';
+  } else {
+    progress = '<div class="live-meta">En cours depuis '+elapsedMin+' min</div>';
+  }
+  const scoreHtml = sc
+    ? '<div class="live-score tnum"><span>'+homeName+'</span><b>'+sc.home+' – '+sc.away+'</b><span>'+awayName+'</span></div>'
+    : '<div class="live-score muted">Score live non disponible pour cette compétition</div>';
+  // Alerte : le prono figé (pré-match) est actuellement mené au score.
+  let alert = "";
+  const secure = securePickOf(m);
+  if (sc && secure && sport==="football") {
+    const h = Number(sc.home), a = Number(sc.away);
+    const trailing = (secure.key==="home" && h<a) || (secure.key==="away" && a<h);
+    const drawBroken = secure.key==="draw" && h!==a;
+    if (trailing) alert = '<div class="live-alert">⚠️ '+secure.label+' (prono '+fmtPct(secure.pModel)+') est mené '+h+'–'+a+'.</div>';
+    else if (drawBroken) alert = '<div class="live-alert">⚠️ Le nul pronostiqué n\'est plus d\'actualité ('+h+'–'+a+').</div>';
+  } else if (sc && secure && sport==="tennis") {
+    const h = Number(sc.home), a = Number(sc.away);
+    if ((secure.key==="p1" && h<a) || (secure.key==="p2" && a<h)) alert = '<div class="live-alert">⚠️ '+secure.label+' (prono '+fmtPct(secure.pModel)+') est mené '+h+'–'+a+' en sets.</div>';
+  }
+  // Mouvement de cote : cote pré-match figée vs dernière cote relevée pendant le match.
+  let move = "";
+  if (secure && t.liveOdds && t.liveOdds[secure.key]) {
+    const live = t.liveOdds[secure.key], pre = secure.bestOdds;
+    const pct = (live-pre)/pre*100;
+    const dir = pct>2 ? "up" : pct<-2 ? "down" : "flat";
+    move = '<div class="live-odds tnum">Cote '+secure.label+' : '+fmtOdds(pre)+' avant match → <b class="'+dir+'">'+fmtOdds(live)+'</b> en live'
+      + ' <span class="muted">('+(pct>=0?"+":"")+pct.toFixed(0)+' %, relevé à '+new Date(t.liveOddsAt).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Paris"})+')</span></div>';
+  }
+  return '<div class="live-box"><div class="live-head"><span class="live-dot"></span> EN DIRECT</div>'
+    + scoreHtml + progress + alert + move
+    + '<div class="live-note">Mis à jour à chaque actualisation (bouton ↻). Le prono reste celui figé au coup d\'envoi.</div></div>';
+}
+
+/* =========================================================================
+   MODULE E — COURBE DE BANKROLL (Journal)
+   Bankroll de référence + somme cumulée des gains/pertes des paris réglés,
+   dans l'ordre réel de règlement.
+   ========================================================================= */
+let bankrollChartInstance = null;
+function bankrollHistoryPoints(){
+  const settled = journal.filter(function(b){ return b.status==="won" || b.status==="lost"; })
+    .slice().sort(function(a,b){ return (a.settledAt||a.addedAt).localeCompare(b.settledAt||b.addedAt); });
+  const totalProfit = settled.reduce(function(sum,b){ return sum + (b.status==="won" ? b.stake*(b.odds-1) : -b.stake); }, 0);
+  // La bankroll actuelle (réglée par l'utilisateur) est le point d'arrivée ; on remonte au point de départ.
+  let bank = state.bankroll - totalProfit;
+  const points = [{ label:"Départ", value: Math.round(bank*100)/100 }];
+  settled.forEach(function(b){
+    bank += b.status==="won" ? b.stake*(b.odds-1) : -b.stake;
+    points.push({ label: new Date(b.settledAt||b.addedAt).toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",timeZone:"Europe/Paris"}), value: Math.round(bank*100)/100 });
+  });
+  return points;
+}
+function bankrollChartSectionHtml(){
+  const settledCount = journal.filter(function(b){ return b.status==="won" || b.status==="lost"; }).length;
+  if (!settledCount) return '<section class="home-section"><h2>Évolution de la bankroll</h2><p class="tab-empty">La courbe apparaîtra dès qu\'un pari du journal sera marqué gagné ou perdu.</p></section>';
+  const pts = bankrollHistoryPoints();
+  const start = pts[0].value, end = pts[pts.length-1].value;
+  const diff = end-start;
+  return '<section class="home-section"><h2>Évolution de la bankroll</h2>'
+    + '<div class="bank-kpis tnum"><div><span>Départ</span><b>'+fmtEur(start)+'</b></div><div><span>Actuelle</span><b>'+fmtEur(end)+'</b></div>'
+    + '<div><span>Variation</span><b class="'+(diff>=0?"pos":"neg")+'">'+(diff>=0?"+":"")+fmtEur(diff)+' ('+(start>0?((diff/start*100>=0?"+":"")+(diff/start*100).toFixed(1).replace(".",",")):"—")+' %)</b></div></div>'
+    + '<div style="position:relative;height:200px;"><canvas id="bankrollChart"></canvas></div>'
+    + '<p style="font-size:10.5px;color:var(--haze);margin:6px 0 0;">Basée sur les paris réglés du journal, en remontant depuis ta bankroll actuelle ('+fmtEur(state.bankroll)+').</p>'
+    + '</section>';
+}
+function renderBankrollChart(){
+  const canvas = document.getElementById("bankrollChart");
+  if (!canvas || typeof Chart==="undefined") return;
+  if (bankrollChartInstance) { bankrollChartInstance.destroy(); bankrollChartInstance = null; }
+  let ctx2d; try { ctx2d = canvas.getContext("2d"); } catch(e){ ctx2d = null; }
+  if (!ctx2d) return;
+  const pts = bankrollHistoryPoints();
+  const up = pts[pts.length-1].value >= pts[0].value;
+  try {
+    bankrollChartInstance = new Chart(ctx2d, {
+      type:"line",
+      data:{ labels: pts.map(function(p){ return p.label; }),
+        datasets:[{ data: pts.map(function(p){ return p.value; }), borderColor: up?"#22c55e":"#E2606B",
+          backgroundColor: up?"rgba(34,197,94,0.12)":"rgba(226,96,107,0.12)", fill:true, tension:0.25, pointRadius:2 }] },
+      options:{ responsive:true, maintainAspectRatio:false, interaction:{ intersect:false, mode:"index" },
+        plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:function(c){ return fmtEur(c.parsed.y); } } } },
+        scales:{ y:{ ticks:{ color:"#8695B3", callback:function(v){ return v+" €"; } }, grid:{ color:"rgba(134,149,179,0.12)" } },
+          x:{ ticks:{ color:"#8695B3", maxRotation:0, autoSkip:true, maxTicksLimit:6 }, grid:{ display:false } } } },
+    });
+  } catch(e){ console.warn("BetIA : graphique bankroll indisponible.", e); }
+}
+
 function renderHome(){
   const stats = computeTodayStats();
   const el = document.getElementById("pageHome");
@@ -2680,6 +3032,7 @@ function renderJournalPage(){
       ? '<p class="tab-empty">Aucun pari suivi pour l\'instant. Depuis l\'analyse d\'un match, clique sur « Suivre » à côté d\'un pari value pour l\'ajouter ici.</p>'
       : '<div class="bet-list">' + journal.map(betRowHtml).join("") + '</div>')
     + '</section>'
+    + bankrollChartSectionHtml()
     + journalStatsChartSectionHtml()
     + notificationsSectionHtml()
     + responsibleGamblingHtml()
@@ -2711,6 +3064,7 @@ function renderJournalPage(){
   const notifBtn = document.getElementById("enableNotifBtn");
   if (notifBtn) notifBtn.onclick = requestNotificationPermission;
   renderJournalStatsCharts();
+  renderBankrollChart();
   el.querySelectorAll("[data-status]").forEach(function(b){ b.onclick = function(){ setBetStatus(b.dataset.bet, b.dataset.status); }; });
   el.querySelectorAll("[data-remove]").forEach(function(b){ b.onclick = function(){ removeBet(b.dataset.remove); }; });
 }
@@ -3011,14 +3365,19 @@ function drawerHtml(m){
     + '<h2 id="drawerTitle">'+title+'</h2>'
     + '<p class="sub">'+subtitle+'</p>'
     + resultBannerHtml(m)
+    + liveBlockHtml(m)
+    + confidenceDetailHtml(m)
     + generateCoachAnalysis(m)
     + tabsBarHtml(drawerTab, "drawer", sport, m)
     + '<div id="drawerBody">' + drawerBodyHtml(m) + '</div>'
+    + oddsComparatorHtml(m)
+    + stakeCalculatorHtml(m)
     + manualResultButtonsHtml(m)
     + '<div class="drawer-sticky-footer"><button class="back-btn-full" id="backBtnBottom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg><span>Retour aux matchs</span></button></div>';
 }
 
 function bindDrawerEvents(m){
+  bindStakeCalculator(m);
   // Trois façons fluides de revenir à la grille : la croix, le bouton "Retour" en haut, et sa version
   // sticky en bas — la grille elle-même n'a jamais bougé pendant que le drawer était ouvert, donc fermer
   // suffit à retrouver exactement le même point de défilement.
@@ -3159,7 +3518,9 @@ function addToJournal(selId){
 function setBetStatus(betId, status){
   const b = journal.find(function(x){ return x.id===betId; });
   if (!b) return;
-  b.status = status; saveJournal(); renderJournalPage(); renderJournalBadge();
+  b.status = status;
+  b.settledAt = (status==="won" || status==="lost") ? new Date().toISOString() : null;
+  saveJournal(); renderJournalPage(); renderJournalBadge();
 }
 function removeBet(betId){
   journal = journal.filter(function(x){ return x.id!==betId; });
