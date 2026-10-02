@@ -1,12 +1,13 @@
-(Aucun objet)
-Melvyn Clouzet
-vous
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BetIA — Pronos sécurisés & Meilleures cotes</title>
+<meta name="theme-color" content="#060A13">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --abyss:#0A1322; --deck:#111C31; --rail:#1D2B47; --mist:#E4EAF5;
@@ -483,6 +484,395 @@ vous
     .sels{ grid-template-columns:repeat(3,1fr); gap:6px; } .sel .odds{ font-size:16px; }
     .journal-summary{ grid-template-columns:repeat(2,1fr); }
   }
+
+  /* =========================================================================
+     REFONTE VISUELLE « MIDNIGHT GLASS » — couche d'habillage uniquement.
+     Elle se superpose aux règles existantes (mêmes classes, aucune logique JS
+     touchée). Sémantique des couleurs conservée : vert = prono sécurisé,
+     or = value, rouge = live, cyan = navigation.
+     ========================================================================= */
+  :root {
+    --abyss:#060A13; --deck:rgba(16,24,42,0.62); --rail:rgba(150,175,215,0.13); --mist:#EAF0FA;
+    --haze:#8B97B2; --gold:#F5B942; --tide:#4FD1F0; --ember:#FF5A6E;
+    --pitch:#2EE59D;
+    --glass:rgba(16,24,42,0.62); --glass-strong:rgba(13,20,36,0.86); --glass-soft:rgba(255,255,255,0.035);
+    --line:rgba(150,175,215,0.13); --line-strong:rgba(150,175,215,0.22);
+    --hl:inset 0 1px 0 rgba(255,255,255,0.06);
+    --shadow:0 10px 30px -12px rgba(0,0,0,0.65), 0 2px 6px rgba(0,0,0,0.25);
+    --ease:cubic-bezier(.22,1,.36,1);
+    --r-card:22px; --r-block:14px; --r-tile:12px;
+    --font:"Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  html { background:#060A13; }
+  body {
+    font-family:var(--font); font-size:15px; letter-spacing:-0.005em;
+    background:
+      radial-gradient(120% 60% at 15% -10%, rgba(79,209,240,0.10), transparent 60%),
+      radial-gradient(90% 50% at 100% 110%, rgba(46,229,157,0.07), transparent 60%),
+      #060A13;
+    background-attachment:fixed;
+    font-feature-settings:"tnum" 1, "cv11" 1;
+  }
+  button, input, select { font-family:inherit; }
+  :focus-visible { outline:2px solid var(--tide); outline-offset:2px; border-radius:10px; }
+  ::selection { background:rgba(79,209,240,0.3); }
+
+  /* Les petits libellés en capitales espacées deviennent des libellés sobres en casse normale */
+  .sub-title, .section-label, .ai-coach-title, .pillar-missing-title, .comparator th, .secure-pick-label,
+  .live-head, .challenge-title, .info-step { text-transform:none !important; letter-spacing:0 !important; }
+
+  /* ---------- Header : barre de verre collante ---------- */
+  .app-header {
+    position:sticky; top:0; z-index:25;
+    background:rgba(6,10,19,0.72); -webkit-backdrop-filter:blur(18px) saturate(140%); backdrop-filter:blur(18px) saturate(140%);
+    border-bottom:1px solid var(--line);
+  }
+  .app-brand { font-size:17px; font-weight:800; letter-spacing:-0.03em; }
+  .icon-btn { background:var(--glass-soft); border-color:var(--line); box-shadow:var(--hl); color:var(--mist);
+    transition:transform .18s var(--ease), background .18s ease, border-color .18s ease; }
+  .icon-btn:hover { background:rgba(255,255,255,0.07); border-color:var(--line-strong); }
+  .icon-btn:active { transform:scale(0.9); }
+  .header-bankroll { background:linear-gradient(135deg, rgba(245,185,66,0.18), rgba(245,185,66,0.06));
+    border-color:rgba(245,185,66,0.35); box-shadow:var(--hl), 0 0 18px -6px rgba(245,185,66,0.45); padding:5px 10px; font-size:12px; }
+  .error-banner { background:rgba(255,90,110,0.12); border-bottom-color:rgba(255,90,110,0.35); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+
+  /* ---------- Pages & titres ---------- */
+  .page { padding-left:18px; padding-right:18px; }
+  .page-title { font-size:28px; font-weight:800; letter-spacing:-0.035em; line-height:1.1; margin:14px 0 6px; }
+  .page-sub { font-size:14px; line-height:1.5; max-width:62ch; }
+  .home-section { margin-bottom:30px; }
+  .home-section h2 { font-size:18px; font-weight:800; letter-spacing:-0.02em; margin-bottom:14px; }
+  .sub-title { font-size:12.5px; font-weight:700; color:var(--mist); opacity:.75; }
+  .section-label { font-size:13px !important; font-weight:800; color:var(--mist); margin:10px 2px 2px; }
+  .section-label.live { color:var(--ember); }
+  .empty, .tab-empty { border:1px dashed var(--line-strong); border-radius:var(--r-block); padding:18px; text-align:center; color:var(--haze); background:var(--glass-soft); }
+
+  /* ---------- Tabbar flottante en verre ---------- */
+  .tabbar {
+    left:12px; right:12px; bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+    border:1px solid var(--line-strong); border-radius:24px;
+    background:rgba(12,18,32,0.78); -webkit-backdrop-filter:blur(22px) saturate(160%); backdrop-filter:blur(22px) saturate(160%);
+    box-shadow:var(--hl), 0 18px 40px -12px rgba(0,0,0,0.75);
+    padding:6px; max-width:736px;
+  }
+  @media (min-width:784px){ .tabbar { left:0; right:0; } }
+  .tab-btn { border-radius:18px; font-size:11px; font-weight:700; transition:color .2s ease, background .25s var(--ease), transform .18s var(--ease); }
+  .tab-btn:active { transform:scale(0.94); }
+  .tab-btn.active { color:var(--mist); background:linear-gradient(180deg, rgba(79,209,240,0.20), rgba(79,209,240,0.08)); box-shadow:inset 0 0 0 1px rgba(79,209,240,0.28); }
+  .tab-btn.active svg { color:var(--tide); filter:drop-shadow(0 0 6px rgba(79,209,240,0.55)); }
+  .page { padding-bottom:calc(110px + env(safe-area-inset-bottom,0px)); }
+  .badge-count { background:linear-gradient(135deg,#FFD27A,#F5B942); box-shadow:0 0 10px rgba(245,185,66,0.55); }
+
+  /* ---------- Puces de filtre & onglets de marché ---------- */
+  .chip { background:var(--glass-soft); border-color:var(--line); color:var(--haze); font-weight:600; font-size:13px;
+    transition:background .2s ease, color .2s ease, border-color .2s ease, transform .15s var(--ease); }
+  .chip:hover { color:var(--mist); border-color:var(--line-strong); }
+  .chip:active { transform:scale(0.95); }
+  .chip[aria-pressed="true"] { color:#04121A; background:linear-gradient(135deg,#7FE3F7,#4FD1F0); border-color:transparent; box-shadow:0 4px 14px -4px rgba(79,209,240,0.6); }
+  .chip.gold-active[aria-pressed="true"] { color:#1A1203; background:linear-gradient(135deg,#FFD27A,#F5B942); box-shadow:0 4px 14px -4px rgba(245,185,66,0.6); }
+  .chip:disabled { opacity:.35; }
+  .market-tabs { gap:6px; padding:4px; border-radius:16px; background:var(--glass-soft); border:1px solid var(--line); }
+  .mtab { border:none; border-radius:12px; font-weight:700; padding:8px 12px; transition:background .22s var(--ease), color .2s ease; }
+  .mtab.active { background:rgba(79,209,240,0.16); color:var(--mist); box-shadow:inset 0 0 0 1px rgba(79,209,240,0.3); }
+  .search-input { background:var(--glass); border-color:var(--line); border-radius:16px; padding-top:12px; padding-bottom:12px; box-shadow:var(--hl);
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
+  .search-input:focus { border-color:rgba(79,209,240,0.5); outline:none; box-shadow:0 0 0 4px rgba(79,209,240,0.12); }
+  input[type=range] { accent-color:var(--tide); }
+
+  /* ---------- Cartes de match ---------- */
+  .cards { gap:16px; }
+  .card {
+    background:linear-gradient(180deg, rgba(22,32,56,0.70), rgba(12,18,33,0.70));
+    border:1px solid var(--line); border-radius:var(--r-card); padding:18px;
+    -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
+    box-shadow:var(--hl), var(--shadow);
+    transition:border-color .25s ease, transform .25s var(--ease), box-shadow .25s ease;
+  }
+  .card:hover, .card:focus-visible { border-color:rgba(79,209,240,0.35); box-shadow:var(--hl), var(--shadow), 0 0 0 1px rgba(79,209,240,0.10); }
+  .card:active { transform:scale(0.985); }
+  .card-head { font-size:12.5px; font-weight:600; }
+  .comp-badge { border-radius:8px; font-weight:700; }
+  .teams { gap:10px 16px; margin:4px 0 14px; }
+  .team .badge { width:32px; height:32px; font-size:11.5px; font-weight:800; color:var(--mist);
+    background:linear-gradient(145deg, rgba(79,209,240,0.22), rgba(79,209,240,0.05)); box-shadow:inset 0 0 0 1px rgba(79,209,240,0.25); }
+  .team span.name { font-size:16.5px; font-weight:800; letter-spacing:-0.02em; }
+  .vs { color:var(--haze); font-weight:700; font-size:12px; }
+  .status-dot.live { background:var(--ember); box-shadow:0 0 8px var(--ember); }
+  .open-btn { color:var(--tide); font-weight:700; }
+
+  /* Tuiles de cote façon ticker */
+  .odds-row { gap:8px; }
+  .odds-chip { flex:1 1 0; min-width:64px; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:var(--r-tile);
+    padding:9px 10px; box-shadow:var(--hl); }
+  .odds-chip b { font-size:17px; font-weight:800; letter-spacing:-0.02em; }
+  .odds-chip small { font-size:10px; font-weight:600; }
+
+  /* Élément signature : le ticket "Prono sécurisé" à bordure lumineuse */
+  .secure-pick-banner {
+    position:relative; border:1px solid transparent; border-radius:18px; padding:13px 14px 12px; gap:3px;
+    background:
+      linear-gradient(180deg, rgba(10,28,26,0.92), rgba(9,20,26,0.92)) padding-box,
+      linear-gradient(135deg, rgba(46,229,157,0.85), rgba(79,209,240,0.35) 55%, rgba(46,229,157,0.15)) border-box;
+    box-shadow:0 0 28px -10px rgba(46,229,157,0.55), var(--hl);
+  }
+  .secure-pick-banner.lean {
+    background:
+      linear-gradient(180deg, rgba(30,24,10,0.92), rgba(24,19,9,0.92)) padding-box,
+      linear-gradient(135deg, rgba(245,185,66,0.8), rgba(245,185,66,0.15)) border-box;
+    box-shadow:0 0 26px -12px rgba(245,185,66,0.5), var(--hl);
+  }
+  .secure-pick-banner.pending { filter:saturate(0.85); }
+  .secure-pick-label { font-size:12px !important; font-weight:800; color:var(--pitch); }
+  .secure-pick-banner.lean .secure-pick-label { color:var(--gold); }
+  .secure-pick-main { font-size:18px; font-weight:800; letter-spacing:-0.025em; }
+  .secure-pick-main b { color:var(--pitch); }
+  .secure-pick-banner.lean .secure-pick-main b { color:var(--gold); }
+  .secure-pick-book { font-size:12px; }
+  .combo-add-btn { align-self:flex-start; background:rgba(79,209,240,0.10); border-color:rgba(79,209,240,0.4); font-weight:700;
+    transition:transform .15s var(--ease), background .2s ease; }
+  .combo-add-btn:active { transform:scale(0.94); }
+  .combo-add-btn.in-combo { background:rgba(46,229,157,0.12); border-color:var(--pitch); color:var(--pitch); }
+
+  /* Étoiles de confiance */
+  .conf-stars { font-size:13px; gap:2px; }
+  .conf-stars .on { color:var(--gold); text-shadow:0 0 8px rgba(245,185,66,0.55); }
+  .conf-stars .off { color:rgba(150,175,215,0.22); }
+  .conf-box { background:var(--glass-soft); border-color:var(--line); border-radius:var(--r-block); padding:12px 14px; box-shadow:var(--hl); }
+  .conf-box .conf-stars { font-size:18px; }
+
+  /* Pastilles & badges */
+  .ai-pill { border-radius:999px; font-weight:700; }
+  .ai-pill.has { background:linear-gradient(135deg, rgba(245,185,66,0.20), rgba(245,185,66,0.07)); color:var(--gold); box-shadow:inset 0 0 0 1px rgba(245,185,66,0.3); }
+  .ai-pill.muted { background:var(--glass-soft); box-shadow:inset 0 0 0 1px var(--line); }
+  .ev-badge { background:linear-gradient(135deg,#FFD27A,#F5B942); color:#1A1203; font-weight:800; box-shadow:0 2px 10px -2px rgba(245,185,66,0.6); }
+  .favori-badge { background:linear-gradient(135deg,#6BF2BE,#2EE59D); color:#04170F; box-shadow:0 2px 10px -2px rgba(46,229,157,0.55); }
+  .result-banner { border-radius:var(--r-block); padding:10px 12px; font-size:13px; }
+  .result-banner.win { background:rgba(46,229,157,0.12); color:var(--pitch); border-color:rgba(46,229,157,0.38); }
+  .result-banner.lose { background:rgba(255,90,110,0.12); color:#FF8A98; border-color:rgba(255,90,110,0.38); }
+  .manual-result { background:var(--glass); border-color:var(--line); border-radius:0 0 var(--r-card) var(--r-card); }
+  .manual-btn { background:var(--glass-soft); border-color:var(--line-strong); transition:transform .15s var(--ease), border-color .2s ease; }
+  .manual-btn:active { transform:scale(0.95); }
+
+  /* ---------- Sélections (drawer) ---------- */
+  .sel, .mini-opt, .player-row { background:rgba(255,255,255,0.025); border-color:var(--line); border-radius:var(--r-block); box-shadow:var(--hl); }
+  .sel.favori, .mini-opt.favori, .player-row.favori { border:1px solid rgba(46,229,157,0.6); background:linear-gradient(180deg, rgba(46,229,157,0.10), rgba(46,229,157,0.03));
+    box-shadow:0 0 22px -10px rgba(46,229,157,0.6), var(--hl); }
+  .prob-big { font-size:30px; letter-spacing:-0.04em; }
+
+  /* ---------- Drawer : verre profond, bottom-sheet sur mobile ---------- */
+  .overlay { background:rgba(3,6,12,0.55); -webkit-backdrop-filter:blur(10px) saturate(120%); backdrop-filter:blur(10px) saturate(120%);
+    transition:opacity .35s var(--ease); }
+  .drawer {
+    background:linear-gradient(180deg, rgba(14,21,38,0.94), rgba(8,13,24,0.96));
+    -webkit-backdrop-filter:blur(26px) saturate(150%); backdrop-filter:blur(26px) saturate(150%);
+    border-left:1px solid var(--line-strong); box-shadow:-30px 0 60px -20px rgba(0,0,0,0.7);
+    transition:transform .5s var(--ease); max-width:520px;
+    overscroll-behavior:contain;
+  }
+  @media (min-width:641px){ .drawer { border-radius:28px 0 0 28px; } }
+  @media (max-width:640px){
+    .drawer { top:max(env(safe-area-inset-top,0px), 5vh); border-left:none; border-top:1px solid var(--line-strong);
+      border-radius:28px 28px 0 0; transform:translateY(105%); box-shadow:0 -30px 60px -20px rgba(0,0,0,0.75);
+      padding-top:26px; }
+    .drawer.open { transform:translateY(0); }
+    .drawer::before { content:""; position:absolute; top:9px; left:50%; width:42px; height:5px; margin-left:-21px; border-radius:999px; background:rgba(150,175,215,0.35); }
+    .drawer .close, .back-btn-top { top:20px; }
+    .drawer-status { margin-top:44px; }
+  }
+  .drawer h2 { font-size:24px; font-weight:800; letter-spacing:-0.035em; line-height:1.15; }
+  .drawer h3 { font-size:15px; font-weight:800; letter-spacing:-0.015em; }
+  .drawer section { margin-bottom:28px; }
+  .back-btn-top, .drawer .close { background:var(--glass-soft); border:1px solid var(--line); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+  .drawer-sticky-footer { background:rgba(8,13,24,0.88); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); border-top-color:var(--line); }
+  .back-btn-full { background:linear-gradient(135deg, rgba(79,209,240,0.22), rgba(79,209,240,0.08)); border-color:rgba(79,209,240,0.35);
+    border-radius:16px; font-weight:800; transition:transform .15s var(--ease), background .2s ease; }
+  .back-btn-full:active { transform:scale(0.97); }
+
+  /* ---------- Coach, rapport de force, piliers : widgets de data-viz ---------- */
+  .ai-coach-box { position:relative; border:1px solid rgba(79,209,240,0.28); border-radius:18px; padding:14px 16px 14px 18px;
+    background:linear-gradient(135deg, rgba(79,209,240,0.10), rgba(79,209,240,0.02)); box-shadow:var(--hl); font-size:13.5px; line-height:1.6; }
+  .ai-coach-box::before { content:""; position:absolute; left:0; top:14px; bottom:14px; width:3px; border-radius:0 3px 3px 0; background:linear-gradient(180deg,#7FE3F7,#4FD1F0); }
+  .ai-coach-title { font-size:12.5px !important; }
+  .strength-box { background:var(--glass-soft); border-color:var(--line); border-radius:18px; padding:14px; box-shadow:var(--hl); }
+  .strength-head { font-size:13.5px; font-weight:800; }
+  .strength-bar { height:14px; gap:3px; background:transparent; }
+  .strength-bar span:first-child { border-radius:999px 0 0 999px; }
+  .strength-bar span:last-child { border-radius:0 999px 999px 0; }
+  .strength-legend { font-size:12.5px; gap:8px 14px; }
+  .strength-legend b { font-weight:800; }
+  .pillar { background:rgba(255,255,255,0.025); border-color:var(--line); border-radius:var(--r-block); padding:12px 14px; box-shadow:var(--hl); }
+  .pillar.real { border-color:rgba(46,229,157,0.32); background:linear-gradient(180deg, rgba(46,229,157,0.07), rgba(46,229,157,0.01)); }
+  .pillar-name { font-size:14px; font-weight:800; }
+  .pillar-badge { font-size:10.5px; padding:3px 9px; }
+  .pillar-gauge-track { height:9px; background:rgba(150,175,215,0.12); }
+  .pillar-gauge-fill { background:linear-gradient(90deg, rgba(46,229,157,0.55), #2EE59D); box-shadow:0 0 10px rgba(46,229,157,0.6); }
+  .pillar-gauge-fill.left { background:linear-gradient(270deg, rgba(46,229,157,0.55), #2EE59D); }
+  .pillar-gauge-mid { width:2px; background:var(--mist); opacity:.35; }
+  .pillar-gauge-label { font-size:11.5px; font-weight:700; color:var(--mist); opacity:.8; }
+  .wdl { border-radius:8px; min-width:30px; padding:3px 6px; font-weight:800; }
+  .pillar-missing { background:transparent; border-color:var(--line-strong); border-radius:var(--r-block); }
+  .pillar-missing-title { font-size:12px !important; color:var(--mist); opacity:.7; }
+  .factor { border-color:var(--line); border-radius:var(--r-block); background:var(--glass-soft); }
+
+  /* ---------- Comparateur : blocs de données au lieu d'un tableau austère ---------- */
+  .comparator { border-collapse:separate; border-spacing:0 6px; font-size:13px; }
+  .comparator th { font-size:11.5px !important; font-weight:700; border-bottom:none; padding:2px 8px; color:var(--haze); }
+  .comparator td { border-bottom:none; padding:10px 8px; background:rgba(255,255,255,0.03); }
+  .comparator tbody tr td:first-child { border-radius:12px 0 0 12px; padding-left:12px; font-weight:700; }
+  .comparator tbody tr td:last-child { border-radius:0 12px 12px 0; padding-right:12px; }
+  .comparator .best-odds { background:transparent; color:var(--pitch); position:relative; }
+  .comparator .best-odds::after { content:""; position:absolute; inset:5px 4px; border-radius:9px; background:rgba(46,229,157,0.14); box-shadow:inset 0 0 0 1px rgba(46,229,157,0.45); z-index:-0; pointer-events:none; }
+  .comparator .margin-row td, .comparator .link-row td { background:transparent; }
+  .comparator .margin-row td { font-size:11.5px; padding-top:4px; padding-bottom:4px; }
+  .book-link { border-radius:999px; padding:4px 10px; background:rgba(79,209,240,0.10); box-shadow:inset 0 0 0 1px rgba(79,209,240,0.3); color:var(--tide); text-decoration:none; font-weight:700; font-size:11.5px; white-space:nowrap; }
+  .table-scroll table:not(.comparator) td, .table-scroll table:not(.comparator) th { border-color:var(--line); }
+
+  /* ---------- Calculateur ---------- */
+  .calc-field span { font-weight:700; color:var(--haze); }
+  .calc-field select, .calc-field input, .bankroll-row input, .combo-stake-row input {
+    background:rgba(255,255,255,0.04); border:1px solid var(--line); border-radius:12px; padding:11px 12px; color:var(--mist); box-shadow:var(--hl);
+    transition:border-color .2s ease, box-shadow .2s ease; }
+  .calc-field select:focus, .calc-field input:focus, .bankroll-row input:focus, .combo-stake-row input:focus { outline:none; border-color:rgba(79,209,240,0.55); box-shadow:0 0 0 4px rgba(79,209,240,0.12); }
+  .calc-result { background:linear-gradient(180deg, rgba(79,209,240,0.07), rgba(79,209,240,0.01)); border-color:var(--line); border-radius:18px; padding:14px 16px; }
+  .calc-line { font-size:13.5px; padding:5px 0; }
+  .calc-line.big { font-size:17px; font-weight:800; }
+  .calc-line .pos { color:var(--pitch); }
+
+  /* ---------- Live ---------- */
+  .live-box { background:linear-gradient(180deg, rgba(255,90,110,0.12), rgba(255,90,110,0.03)); border-color:rgba(255,90,110,0.4); border-radius:18px; padding:13px 14px; box-shadow:0 0 26px -12px rgba(255,90,110,0.55), var(--hl); }
+  .live-head { font-size:12px !important; }
+  .live-score b { font-size:26px; letter-spacing:-0.03em; }
+  .live-progress { height:6px; background:rgba(255,255,255,0.08); }
+  .live-progress span { background:linear-gradient(90deg, #FF8A98, #FF5A6E); box-shadow:0 0 10px rgba(255,90,110,0.6); }
+  .live-alert { border-radius:12px; }
+
+  /* ---------- Accueil ---------- */
+  .hero-photo { border-radius:26px; box-shadow:0 30px 60px -25px rgba(0,0,0,0.8), 0 0 0 1px var(--line); }
+  .hero-tag { font-size:14px; line-height:1.55; }
+  .kpi-row { gap:10px; }
+  .kpi { background:linear-gradient(180deg, rgba(22,32,56,0.7), rgba(12,18,33,0.7)); border-color:var(--line); border-radius:18px; padding:16px 10px;
+    -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); box-shadow:var(--hl), var(--shadow); }
+  .kpi-val { font-size:26px; letter-spacing:-0.04em; background:linear-gradient(180deg,#FFE3A3,#F5B942); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .kpi-label { font-size:11.5px; line-height:1.35; }
+  .challenge-box { border-radius:22px; padding:18px; background:
+      linear-gradient(160deg, rgba(40,30,8,0.9), rgba(14,18,30,0.9)) padding-box,
+      linear-gradient(135deg, rgba(245,185,66,0.7), rgba(245,185,66,0.08)) border-box; border:1px solid transparent;
+    box-shadow:0 0 30px -14px rgba(245,185,66,0.55), var(--hl); }
+  .challenge-title { font-size:16px; letter-spacing:-0.02em; }
+  .info-card { background:var(--glass); border-color:var(--line); border-radius:18px; box-shadow:var(--hl); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
+  .info-title { font-weight:800; letter-spacing:-0.01em; }
+  .opp-row, .pepite-row { background:linear-gradient(180deg, rgba(22,32,56,0.66), rgba(12,18,33,0.66)); border-color:var(--line); border-radius:18px;
+    box-shadow:var(--hl), var(--shadow); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+    transition:transform .2s var(--ease), border-color .2s ease; }
+  .opp-row:hover, .pepite-row:hover { border-color:rgba(79,209,240,0.32); }
+  .opp-row:active, .pepite-row:active { transform:scale(0.985); }
+  .opp-sel, .pepite-sel { font-weight:800; letter-spacing:-0.015em; }
+  .pepite-cta { background:rgba(79,209,240,0.05); border-left-color:var(--line); }
+  .see-all-btn { border:1px solid rgba(79,209,240,0.35); background:linear-gradient(135deg, rgba(79,209,240,0.16), rgba(79,209,240,0.04));
+    border-radius:16px; font-weight:800; padding:13px; transition:transform .15s var(--ease), background .2s ease; }
+  .see-all-btn:hover { background:linear-gradient(135deg, rgba(79,209,240,0.24), rgba(79,209,240,0.07)); }
+  .see-all-btn:active { transform:scale(0.98); }
+
+  /* ---------- Journal ---------- */
+  .journal-summary { gap:10px; }
+  .jstat { background:linear-gradient(180deg, rgba(22,32,56,0.7), rgba(12,18,33,0.7)); border-color:var(--line); border-radius:18px; padding:14px;
+    box-shadow:var(--hl); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
+  .jval { font-size:22px; font-weight:800; letter-spacing:-0.035em; }
+  .jval.pos { color:var(--pitch); } .jval.neg { color:#FF8A98; }
+  .bank-kpis div { background:var(--glass-soft); border-color:var(--line); border-radius:16px; padding:10px 12px; box-shadow:var(--hl); }
+  .bank-kpis b { font-size:15px; font-weight:800; letter-spacing:-0.02em; }
+  .bet-row { background:var(--glass); border-color:var(--line); border-radius:var(--r-block); box-shadow:var(--hl); }
+  .mini-btn, .track-btn { border-radius:999px; transition:transform .15s var(--ease); }
+  .mini-btn:active, .track-btn:active { transform:scale(0.93); }
+  .limit-bar { height:10px; background:rgba(150,175,215,0.12); }
+  .limit-bar-fill { background:linear-gradient(90deg,#7FE3F7,#4FD1F0); box-shadow:0 0 10px rgba(79,209,240,0.5); }
+  .limit-bar-fill.over { background:linear-gradient(90deg,#FF8A98,#FF5A6E); }
+  .kelly-item { border-radius:var(--r-block); box-shadow:var(--hl); }
+
+  /* ---------- Combiné & toast ---------- */
+  .combo-bar { left:12px; right:12px; bottom:calc(env(safe-area-inset-bottom,0px) + 84px); border:1px solid var(--line-strong); border-radius:22px;
+    background:rgba(12,18,32,0.86); -webkit-backdrop-filter:blur(22px) saturate(150%); backdrop-filter:blur(22px) saturate(150%);
+    box-shadow:var(--hl), 0 20px 44px -14px rgba(0,0,0,0.8); max-width:736px; }
+  @media (min-width:784px){ .combo-bar { left:0; right:0; } }
+  .combo-header b { color:var(--gold); }
+  .combo-gain b { font-size:17px; }
+  .toast { background:rgba(16,24,42,0.9); border-color:var(--line-strong); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
+    bottom:calc(env(safe-area-inset-bottom,0px) + 92px); font-weight:600; box-shadow:var(--hl), 0 14px 30px -10px rgba(0,0,0,0.7); }
+
+  /* L'attribut hidden doit toujours l'emporter sur les display des composants (bandeau d'erreur, badges...) */
+  [hidden] { display:none !important; }
+  .drawer .close { width:38px; height:38px; padding:0; display:grid; place-items:center; color:var(--mist); }
+  .drawer .close svg { width:18px; height:18px; }
+  .sel .prob-big { font-size:26px; }
+  .sel .floor-row { flex-wrap:wrap; gap:0 6px; font-size:11.5px; }
+  .sel .floor-row .fl-val { white-space:nowrap; }
+  .sel .floor-row .book { display:block; font-size:10.5px; }
+  .comparator .best-odds { background:rgba(255,255,255,0.03); }
+  @media (prefers-reduced-motion: reduce){
+    .card, .opp-row, .pepite-row, .chip, .mtab, .tab-btn, .drawer, .overlay { transition:none !important; }
+  }
+  /* Repli si le navigateur ne gère pas le flou : surfaces opaques pour garder la lisibilité */
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+    .app-header, .tabbar, .combo-bar, .drawer, .toast { background:#0D1424; }
+  }
+  /* ---------- Radar Value ---------- */
+  .radar-box { border:1px solid transparent; border-radius:22px; padding:16px;
+    background:linear-gradient(180deg, rgba(30,22,10,0.9), rgba(12,17,30,0.9)) padding-box,
+      linear-gradient(135deg, rgba(245,185,66,0.75), rgba(255,90,110,0.25) 60%, rgba(245,185,66,0.1)) border-box;
+    box-shadow:0 0 30px -14px rgba(245,185,66,0.5), var(--hl); }
+  .radar-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .radar-head h2 { margin:0 !important; }
+  .radar-count { min-width:30px; height:30px; border-radius:999px; display:grid; place-items:center; font-weight:800; font-size:13px;
+    color:#1A1203; background:linear-gradient(135deg,#FFD27A,#F5B942); }
+  .radar-sub { font-size:12.5px; color:var(--haze); margin:6px 0 12px; }
+  .radar-list { display:flex; flex-direction:column; gap:8px; }
+  .radar-row { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; text-align:left; cursor:pointer;
+    background:rgba(255,255,255,0.035); border:1px solid var(--line); border-radius:14px; padding:11px 12px; color:inherit; font:inherit;
+    transition:transform .15s var(--ease), border-color .2s ease; }
+  .radar-row:hover { border-color:rgba(245,185,66,0.45); }
+  .radar-row:active { transform:scale(0.985); }
+  .radar-main { display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .radar-match { font-size:11.5px; color:var(--haze); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .radar-sel { font-size:15px; font-weight:800; letter-spacing:-0.015em; }
+  .radar-meta { font-size:11.5px; color:var(--haze); }
+  .radar-more { font-size:11.5px; color:var(--haze); margin:10px 0 0; }
+  /* ---------- Simulateur d'absences ---------- */
+  .wif-sub { font-size:12px; color:var(--haze); margin:0 0 10px; }
+  .wif-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .wif-team { display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:14px; padding:10px; min-width:0; }
+  .wif-team b { font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .wif-toggle { display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; color:var(--mist); }
+  .wif-toggle input { width:16px; height:16px; accent-color:var(--ember); flex:0 0 auto; }
+  .wif-slider { display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--haze); margin:12px 0 10px; }
+  .wif-slider input { width:100%; accent-color:var(--tide); }
+  .wif-result { border:1px solid var(--line); border-radius:16px; padding:10px 12px; background:rgba(79,209,240,0.04); }
+  .wif-hint { font-size:11.5px; color:var(--haze); margin:0 0 8px; }
+  .wif-xg { display:flex; justify-content:space-between; gap:8px; font-size:12px; color:var(--haze); padding:3px 0; }
+  .wif-xg b { color:var(--mist); }
+  .wif-row { display:grid; grid-template-columns:1fr auto; gap:2px 10px; padding:8px 0; border-top:1px solid var(--line); font-size:12.5px; }
+  .wif-row:first-of-type { margin-top:6px; }
+  .wif-name { font-weight:800; }
+  .wif-row i { font-style:normal; font-size:11px; font-weight:700; }
+  .wif-row i.up { color:var(--pitch); } .wif-row i.down { color:#FF8A98; } .wif-row i.flat { color:var(--haze); }
+  .wif-odds, .wif-ev { font-size:11px; color:var(--haze); }
+  .wif-ev { text-align:right; }
+  .wif-ev.pos { color:var(--gold); font-weight:800; }
+  /* ---------- Slip card ---------- */
+  .slip-btn { margin-top:6px; background:rgba(245,185,66,0.10); border:1px solid rgba(245,185,66,0.4); color:var(--gold); border-radius:999px;
+    padding:5px 11px; font-size:11.5px; font-weight:700; cursor:pointer; transition:transform .15s var(--ease); }
+  .slip-btn:active { transform:scale(0.94); }
+  .pick-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:8px; }
+  .pick-actions .combo-add-btn, .pick-actions .slip-btn { margin-top:0; }
+  .result-actions { margin:0 0 10px; }
+  .slip-modal { position:fixed; inset:0; z-index:70; display:grid; place-items:center; padding:20px;
+    background:rgba(3,6,12,0.7); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); animation:slipIn .3s var(--ease); }
+  @keyframes slipIn { from { opacity:0; } to { opacity:1; } }
+  .slip-panel { width:100%; max-width:380px; display:flex; flex-direction:column; gap:12px; }
+  .slip-preview { width:100%; height:auto; border-radius:22px; box-shadow:0 30px 60px -20px rgba(0,0,0,0.85), 0 0 0 1px var(--line-strong); }
+  .slip-actions { display:flex; flex-direction:column; gap:8px; }
+  .slip-actions .see-all-btn { margin-top:0; }
+  .slip-close { background:none; border:none; color:var(--haze); font-weight:700; padding:10px; cursor:pointer; }
+  @media (prefers-reduced-motion: reduce){ .slip-modal { animation:none; } }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 </head>
@@ -1770,11 +2160,13 @@ function renderComboBar(){
         }).join("")
       + '<div class="combo-stake-row"><span>Mise</span><input type="number" min="1" step="1" id="comboStakeInput" value="'+defaultStake+'"><span>€</span></div>'
       + '<div class="combo-gain tnum">Gain potentiel : <b id="comboGain">'+fmtEur(defaultStake*totalOdds)+'</b></div>'
+      + '<button class="see-all-btn" id="comboSlipBtn">📸 Générer la carte du combiné</button>'
       + '<button class="combo-clear" id="comboClearBtn">Vider le combiné</button>'
     + '</div></div>';
   if (existing) existing.outerHTML = html; else document.body.insertAdjacentHTML("beforeend", html);
   document.getElementById("comboToggle").onclick = function(){ comboCollapsed = !comboCollapsed; renderComboBar(); };
   document.getElementById("comboClearBtn").onclick = clearCombo;
+  document.getElementById("comboSlipBtn").onclick = function(){ openSlipModal(slipDataForCombo()); };
   document.querySelectorAll("[data-remove-combo]").forEach(function(b){ b.onclick = function(){ removeFromCombo(b.dataset.removeCombo); }; });
   document.getElementById("comboStakeInput").oninput = function(e){
     const stake = Number(e.target.value)||0;
@@ -1789,6 +2181,17 @@ function refreshComboButtons(){
     const inCombo = comboHasMatch(btn.dataset.comboAdd);
     btn.textContent = inCombo ? "✓ Dans le combiné" : "+ Combiné";
     btn.classList.toggle("in-combo", inCombo);
+  });
+}
+// Boutons « Générer la carte de prono » des cartes de match (plusieurs par écran, donc via data-attribut).
+// stopPropagation : un clic sur le bouton ne doit pas ouvrir le drawer de la carte.
+function bindSlipButtons(root){
+  root.querySelectorAll("[data-slip-match]").forEach(function(btn){
+    btn.onclick = function(e){
+      e.stopPropagation();
+      const found = findMatchById(btn.dataset.slipMatch);
+      if (found) openSlipModal(slipDataForMatch(found.m));
+    };
   });
 }
 function bindComboButtons(root){
@@ -2189,7 +2592,10 @@ function cardHtml(m){
         + '<span class="secure-pick-main">'+secure.label+' <b class="tnum">'+fmtPct(secure.pModel)+'</b></span>'
         + '<span class="secure-pick-book">Meilleure cote '+fmtOdds(secure.bestOdds)+' · '+secure.bestBookmaker+(isSecure?'':' (mise déconseillée)')+'</span>'
         + '<span class="secure-pick-stars">'+starsHtml(m)+'</span>'
-        + (locked ? '' : '<button class="combo-add-btn" data-combo-add="'+m.id+'">+ Combiné</button>')
+        + '<div class="pick-actions">'
+          + (locked ? '' : '<button class="combo-add-btn" data-combo-add="'+m.id+'">+ Combiné</button>')
+          + '<button class="slip-btn" data-slip-match="'+m.id+'">📸 Générer la carte de prono</button>'
+        + '</div>'
       + '</div>';
     }
   }
@@ -2204,6 +2610,7 @@ function cardHtml(m){
       + '<div class="card-head"><div class="left">'+leftHead+'</div>'
         + '<div class="right-meta">'+statusPillHtml(m)+'<time class="tnum">'+fmtTime(m.kickoff)+'</time></div></div>'
       + resultHtml
+      + (resultHtml ? '<div class="pick-actions result-actions"><button class="slip-btn" data-slip-match="'+m.id+'">📸 Générer la carte de prono</button></div>' : '')
       + liveBlockHtml(m)
       + secureHtml
       + (sport==="tennis" ? tennisHeaderHtml(m) : footballHeaderHtml(m))
@@ -2313,6 +2720,7 @@ function renderMatchesPage(){
   });
   bindManualResultButtons(cardsEl);
   bindComboButtons(cardsEl);
+  bindSlipButtons(cardsEl);
 }
 
 /* =========================================================================
@@ -2863,12 +3271,278 @@ function renderBankrollChart(){
   } catch(e){ console.warn("BetIA : graphique bankroll indisponible.", e); }
 }
 
+/* =========================================================================
+   MODULE 1 — RADAR VALUE PRÉ-MATCH (Accueil)
+   Ne scanne QUE les matchs pas encore commencés (matchStatus === "upcoming") :
+   un match qui passe en live ou se termine disparaît automatiquement au
+   rendu suivant. Seuil : EV > 6 % et confiance ≥ 45, tri par EV.
+   ========================================================================= */
+const RADAR_MIN_EV = 0.06;
+function radarOpportunities(){
+  const rows = [];
+  ["football","tennis"].forEach(function(sp){
+    (UPCOMING[sp]||[]).forEach(function(m){
+      if (matchStatus(m)!=="upcoming") return;
+      m.selections.forEach(function(s){
+        if (s.ev > RADAR_MIN_EV && s.confidence >= 45) rows.push({ sel:s, match:m, sport:sp });
+      });
+    });
+  });
+  return rows.sort(function(a,b){ return b.sel.ev - a.sel.ev; });
+}
+function radarWidgetHtml(){
+  const rows = radarOpportunities();
+  const top = rows.slice(0, 5);
+  let body;
+  if (!top.length) {
+    body = '<p class="tab-empty">Aucune value au-dessus de 6 % sur les matchs à venir pour l\'instant. '
+      + 'Elles apparaissent surtout quand les stats de forme, repos ou face-à-face font monter une probabilité au-dessus de ce que dit la cote.</p>';
+  } else {
+    body = '<div class="radar-list">' + top.map(function(x){
+      const s = x.sel, m = x.match;
+      const label = x.sport==="tennis" ? m.player1.name+" – "+m.player2.name : m.home.name+" – "+m.away.name;
+      const tab = MARKET_TAB_OF[x.sport][s.market];
+      const mins = Math.round((new Date(m.kickoff).getTime()-Date.now())/60000);
+      const when = mins < 60 ? "dans "+mins+" min" : "à "+fmtTime(m.kickoff);
+      return '<button class="radar-row" data-opp-match="'+m.id+'" data-opp-tab="'+tab+'">'
+        + '<div class="radar-main"><span class="radar-match">'+label+'</span>'
+        + '<span class="radar-sel">'+s.label+'</span>'
+        + '<span class="radar-meta tnum">Cote '+fmtOdds(s.bestOdds)+' chez '+s.bestBookmaker+' · proba '+fmtPct(s.pModel)+' · '+when+'</span></div>'
+        + '<span class="ev-badge">+EV '+fmtSignedPct(s.ev).replace("+","")+'</span>'
+        + '</button>';
+    }).join("") + '</div>'
+    + (rows.length>5 ? '<p class="radar-more">+'+(rows.length-5)+' autre(s) dans l\'onglet Sûrs, vue Values.</p>' : '');
+  }
+  return '<section class="home-section"><div class="radar-box">'
+    + '<div class="radar-head"><h2>🚨 Radar Value Pré-Match</h2><span class="radar-count tnum">'+rows.length+'</span></div>'
+    + '<p class="radar-sub">Uniquement les matchs pas encore commencés, EV supérieur à 6 %.</p>'
+    + body + '</div></section>';
+}
+
+/* =========================================================================
+   MODULE 2 — SIMULATEUR D'ABSENCES « WHAT IF » (Drawer, football)
+   Simulation uniquement : ne modifie ni le prono figé, ni le journal, ni les
+   stats. On applique l'absence aux buts attendus (xG) du moteur Dixon-Coles,
+   on mesure de combien chaque issue bouge dans la matrice, puis on applique ce
+   même rapport aux probabilités affichées par l'app (renormalisées à 100 %).
+   L'ampleur de l'impact d'une absence est une hypothèse réglable, pas une
+   donnée mesurée : le curseur la rend explicite.
+   ========================================================================= */
+function whatIfHtml(m){
+  if ((m.sport||"football")!=="football" || isMatchLocked(m) || !m.expectedGoals) return "";
+  const opt = function(id, label){ return '<label class="wif-toggle"><input type="checkbox" id="'+id+'"><span>'+label+'</span></label>'; };
+  return '<section><h3>Simulateur d\'absences</h3>'
+    + '<p class="wif-sub">Coche une absence pour voir comment elle ferait bouger les probabilités et la value. Simulation seulement : le prono et le journal ne changent pas.</p>'
+    + '<div class="wif-grid">'
+      + '<div class="wif-team"><b>'+m.home.name+'</b>'+opt("wifHomeAtt","Attaquant / buteur absent")+opt("wifHomeDef","Défenseur central absent")+'</div>'
+      + '<div class="wif-team"><b>'+m.away.name+'</b>'+opt("wifAwayAtt","Attaquant / buteur absent")+opt("wifAwayDef","Défenseur central absent")+'</div>'
+    + '</div>'
+    + '<label class="wif-slider"><span>Impact supposé d\'une absence clé : <b class="tnum" id="wifImpactLbl">12 %</b> des buts attendus</span>'
+      + '<input type="range" id="wifImpact" min="5" max="25" step="1" value="12"></label>'
+    + '<div id="wifResult" class="wif-result"></div>'
+    + '</section>';
+}
+function bindWhatIf(m){
+  const root = document.getElementById("wifResult");
+  if (!root) return;
+  const ids = ["wifHomeAtt","wifHomeDef","wifAwayAtt","wifAwayDef"];
+  const order = ["home","draw","away"];
+  const sels = order.map(function(k){ return m.selections.find(function(s){ return s.market==="h2h" && s.key===k; }); });
+  if (sels.some(function(s){ return !s; })) { root.innerHTML = ""; return; }
+  const lam0 = m.expectedGoals.home, mu0 = m.expectedGoals.away;
+  const base = outcomeProbsFromMatrix(dixonColesMatrix(lam0, mu0, -0.06));
+  const baseOver = ouProbFromMatrix(dixonColesMatrix(lam0, mu0, -0.06), 2.5).over;
+  function compute(){
+    const k = Number(document.getElementById("wifImpact").value)/100;
+    document.getElementById("wifImpactLbl").textContent = Math.round(k*100)+" %";
+    const on = function(id){ return document.getElementById(id).checked; };
+    // Attaquant absent : moins de buts marqués par son équipe. Défenseur absent : plus de buts encaissés
+    // (effet supposé un peu plus faible, 70 % de l'impact choisi).
+    let lam = lam0, mu = mu0;
+    if (on("wifHomeAtt")) lam *= (1-k);
+    if (on("wifAwayDef")) lam *= (1+k*0.7);
+    if (on("wifAwayAtt")) mu *= (1-k);
+    if (on("wifHomeDef")) mu *= (1+k*0.7);
+    const mat = dixonColesMatrix(lam, mu, -0.06);
+    const sim = outcomeProbsFromMatrix(mat);
+    const raw = order.map(function(key, i){ return sels[i].pModel * (sim[key]/base[key]); });
+    const tot = raw.reduce(function(a,b){ return a+b; }, 0);
+    const adj = raw.map(function(v){ return v/tot; });
+    const anyOn = ids.some(on);
+    const rows = order.map(function(key, i){
+      const s = sels[i], p0 = s.pModel, p1 = adj[i];
+      const ev1 = p1*s.bestOdds - 1, d = (p1-p0)*100;
+      const cls = Math.abs(d) < 0.05 ? "flat" : (d>0 ? "up" : "down");
+      return '<div class="wif-row"><span class="wif-name">'+s.label+'</span>'
+        + '<span class="tnum">'+fmtPct(p0)+' → <b>'+fmtPct(p1)+'</b> <i class="'+cls+'">'+(d>=0?"+":"")+d.toFixed(1).replace(".",",")+' pt</i></span>'
+        + '<span class="tnum wif-odds">plancher '+fmtOdds(1/p1)+' · cote '+fmtOdds(s.bestOdds)+'</span>'
+        + '<span class="tnum wif-ev '+(ev1>RADAR_MIN_EV?"pos":"")+'">EV '+(ev1>=0?"+":"")+(ev1*100).toFixed(1).replace(".",",")+' %</span></div>';
+    }).join("");
+    const over1 = ouProbFromMatrix(mat, 2.5).over;
+    root.innerHTML = (anyOn ? "" : '<p class="wif-hint">Aucune absence cochée : les chiffres correspondent au match tel qu\'analysé.</p>')
+      + '<div class="wif-xg tnum"><span>Buts attendus</span><b>'+lam0.toFixed(2).replace(".",",")+' – '+mu0.toFixed(2).replace(".",",")+' → '+lam.toFixed(2).replace(".",",")+' – '+mu.toFixed(2).replace(".",",")+'</b></div>'
+      + '<div class="wif-xg tnum"><span>Plus de 2,5 buts</span><b>'+fmtPct(baseOver)+' → '+fmtPct(over1)+'</b></div>'
+      + rows;
+  }
+  ids.concat(["wifImpact"]).forEach(function(id){ document.getElementById(id).addEventListener("input", compute); document.getElementById(id).addEventListener("change", compute); });
+  compute();
+}
+
+/* =========================================================================
+   MODULE 3 — SLIP CARD (carte de prono partageable)
+   Dessinée en Canvas 2D (aucune librairie externe), au format portrait
+   1080×1350 adapté aux réseaux. Partage natif si disponible, sinon
+   téléchargement ou copie dans le presse-papier. Le message de prévention
+   obligatoire en France pour la promotion des jeux d'argent est inclus.
+   ========================================================================= */
+function slipRoundRect(ctx, x, y, w, h, r){
+  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+function slipWrap(ctx, text, maxW){
+  const words = String(text).split(" "); const lines = []; let cur = "";
+  words.forEach(function(w){ const t = cur ? cur+" "+w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
+  if (cur) lines.push(cur); return lines;
+}
+function drawSlipCard(data){
+  const W=1080, H=1350, F='"Manrope", -apple-system, "Segoe UI", Roboto, sans-serif';
+  const c = document.createElement("canvas"); c.width=W; c.height=H;
+  const ctx = c.getContext("2d");
+  if (!ctx) return null;
+  // Fond minuit + halos
+  ctx.fillStyle="#060A13"; ctx.fillRect(0,0,W,H);
+  let g = ctx.createRadialGradient(160,80,0,160,80,900); g.addColorStop(0,"rgba(79,209,240,0.22)"); g.addColorStop(1,"rgba(79,209,240,0)");
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  g = ctx.createRadialGradient(W,H,0,W,H,800); g.addColorStop(0,"rgba(46,229,157,0.16)"); g.addColorStop(1,"rgba(46,229,157,0)");
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  // En-tête
+  ctx.fillStyle="#EAF0FA"; ctx.font="800 64px "+F; ctx.textBaseline="alphabetic"; ctx.fillText("BetIA", 80, 140);
+  ctx.fillStyle="#8B97B2"; ctx.font="600 30px "+F; ctx.fillText(data.kicker, 80, 190);
+  ctx.textAlign="right"; ctx.fillText(new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric",timeZone:"Europe/Paris"}), W-80, 140); ctx.textAlign="left";
+  // Ticket principal (verre + bordure dégradée)
+  const nLegs = Math.min(5, data.legs.length);
+  const tx=60, ty=240, tw=W-120, th=data.legs.length>1 ? (290 + nLegs*118 + (data.legs.length>5 ? 50 : 0)) : 560;
+  const accent = data.lean ? "#F5B942" : "#2EE59D", accentRgb = data.lean ? "245,185,66" : "46,229,157";
+  const bg = ctx.createLinearGradient(tx,ty,tx+tw,ty+th); bg.addColorStop(0,"rgba("+accentRgb+",0.95)"); bg.addColorStop(0.55,"rgba(79,209,240,0.45)"); bg.addColorStop(1,"rgba("+accentRgb+",0.2)");
+  slipRoundRect(ctx,tx,ty,tw,th,44); ctx.fillStyle=bg; ctx.fill();
+  slipRoundRect(ctx,tx+3,ty+3,tw-6,th-6,41); const inner = ctx.createLinearGradient(0,ty,0,ty+th); inner.addColorStop(0,"#0C1C1F"); inner.addColorStop(1,"#09121D"); ctx.fillStyle=inner; ctx.fill();
+  let y = ty+90;
+  if (data.legs.length===1) {
+    const L = data.legs[0];
+    ctx.fillStyle=accent; ctx.font="800 34px "+F; ctx.fillText(data.badge, tx+60, y);
+    y += 70; ctx.fillStyle="#8B97B2"; ctx.font="600 34px "+F;
+    slipWrap(ctx, L.match, tw-120).forEach(function(line){ ctx.fillText(line, tx+60, y); y+=46; });
+    y += 40; ctx.fillStyle="#EAF0FA"; ctx.font="800 72px "+F;
+    slipWrap(ctx, L.selection, tw-120).slice(0,2).forEach(function(line){ ctx.fillText(line, tx+60, y); y+=84; });
+    y += 30;
+    ctx.fillStyle="#8B97B2"; ctx.font="600 30px "+F; ctx.fillText("Cote", tx+60, y); ctx.fillText("Probabilité IA", tx+tw/2, y);
+    y += 104; ctx.fillStyle="#F5B942"; ctx.font="800 96px "+F; ctx.fillText(fmtOdds(L.odds), tx+60, y);
+    ctx.fillStyle=accent; ctx.fillText(L.proba, tx+tw/2, y);
+    y += 56; ctx.fillStyle="#8B97B2"; ctx.font="600 30px "+F; ctx.fillText("chez "+L.book, tx+60, y);
+  } else {
+    ctx.fillStyle="#2EE59D"; ctx.font="800 34px "+F; ctx.fillText(data.badge, tx+60, y);
+    y += 30;
+    const legs = data.legs.slice(0,5);
+    legs.forEach(function(L){
+      y += 74; ctx.fillStyle="#8B97B2"; ctx.font="600 28px "+F; ctx.fillText(slipWrap(ctx, L.match, tw-300)[0], tx+60, y);
+      y += 44; ctx.fillStyle="#EAF0FA"; ctx.font="800 38px "+F; ctx.fillText(slipWrap(ctx, L.selection, tw-300)[0], tx+60, y);
+      ctx.textAlign="right"; ctx.fillStyle="#F5B942"; ctx.font="800 44px "+F; ctx.fillText(fmtOdds(L.odds), tx+tw-60, y);
+      ctx.fillStyle="#8B97B2"; ctx.font="600 24px "+F; ctx.fillText(L.book, tx+tw-60, y-48); ctx.textAlign="left";
+    });
+    if (data.legs.length>5) { y += 50; ctx.fillStyle="#8B97B2"; ctx.font="600 28px "+F; ctx.fillText("+ "+(data.legs.length-5)+" autre(s) sélection(s)", tx+60, y); }
+    y = ty+th-70;
+    ctx.fillStyle="#8B97B2"; ctx.font="600 30px "+F; ctx.fillText("Cote totale", tx+60, y);
+    ctx.textAlign="right"; ctx.fillStyle="#F5B942"; ctx.font="800 64px "+F; ctx.fillText(fmtOdds(data.totalOdds), tx+tw-60, y+6); ctx.textAlign="left";
+  }
+  // Étoiles de confiance
+  if (data.stars) {
+    const sy = ty+th+110; ctx.font="800 30px "+F; ctx.fillStyle="#8B97B2"; ctx.fillText("Indice de confiance", 80, sy);
+    ctx.font="800 64px "+F;
+    for (let i=0;i<5;i++){ ctx.fillStyle = i<data.stars ? "#F5B942" : "rgba(150,175,215,0.25)"; ctx.fillText("★", 80+i*70, sy+80); }
+  }
+  // Mention légale obligatoire (prévention jeux d'argent)
+  ctx.fillStyle="rgba(139,151,178,0.95)"; ctx.font="600 24px "+F;
+  let ly = H-110;
+  slipWrap(ctx, "18+ · Jouer comporte des risques : endettement, isolement, dépendance. Pour être aidé, appelez le 09-74-75-13-13 (appel non surtaxé).", W-160)
+    .forEach(function(line){ ctx.fillText(line, 80, ly); ly += 34; });
+  return c;
+}
+// Sur la carte : le statut réel du match une fois commencé (résultat vérifié, en cours, annulé), pour qu'une
+// carte partagée après le coup d'envoi ne puisse pas passer pour un prono publié avant le match.
+function slipStatusSuffix(m, secure){
+  const t = TRACKED[m.id];
+  if (t && t.checked && t.result) return securePickWon(secure, t) ? " · ✅ Prono validé" : " · ❌ Prono perdu";
+  if (matchStatus(m)==="cancelled") return " · Match annulé";
+  if (Date.now() >= new Date(m.kickoff).getTime()) return isInPlay(m) ? " · Match en cours" : " · Résultat en attente";
+  return "";
+}
+function slipDataForMatch(m){
+  const secure = securePickOf(m);
+  if (!secure) return null;
+  const sport = m.sport || "football";
+  return {
+    kicker: m.competition.name+" · "+fmtTime(m.kickoff)+slipStatusSuffix(m, secure),
+    badge: secure.secureLevel==="secure" ? "Prono sécurisé" : "Léger favori",
+    lean: secure.secureLevel!=="secure",
+    legs: [{ match: sport==="tennis" ? m.player1.name+" vs "+m.player2.name : m.home.name+" vs "+m.away.name,
+      selection: secure.label, odds: secure.bestOdds, book: secure.bestBookmaker, proba: fmtPct(secure.pModel) }],
+    stars: confidenceIndex(m).stars,
+  };
+}
+function slipDataForCombo(){
+  if (!COMBO.length) return null;
+  return { kicker: "Combiné · "+COMBO.length+" sélection"+(COMBO.length>1?"s":""), badge: "Mon combiné",
+    legs: COMBO.map(function(c){ return { match:c.matchLabel, selection:c.selLabel, odds:c.odds, book:c.bookmaker }; }),
+    totalOdds: comboTotalOdds(), stars: null };
+}
+function closeSlipModal(){ const el = document.getElementById("slipModal"); if (el) el.remove(); }
+function openSlipModal(data){
+  if (!data) return;
+  const canvas = drawSlipCard(data);
+  if (!canvas) { toast("Impossible de générer l'image sur ce navigateur."); return; }
+  closeSlipModal();
+  const url = canvas.toDataURL("image/png");
+  const canShareFiles = !!(navigator.share && navigator.canShare);
+  const canCopy = !!(navigator.clipboard && window.ClipboardItem);
+  document.body.insertAdjacentHTML("beforeend",
+    '<div class="slip-modal" id="slipModal" role="dialog" aria-modal="true" aria-label="Carte de prono">'
+    + '<div class="slip-panel"><img class="slip-preview" src="'+url+'" alt="Carte de prono BetIA">'
+    + '<div class="slip-actions">'
+      + (canShareFiles ? '<button class="see-all-btn" id="slipShare">Partager</button>' : '')
+      + '<button class="see-all-btn" id="slipDownload">Télécharger l\'image</button>'
+      + (canCopy ? '<button class="see-all-btn" id="slipCopy">Copier l\'image</button>' : '')
+      + '<button class="slip-close" id="slipClose">Fermer</button>'
+    + '</div></div></div>');
+  const modal = document.getElementById("slipModal");
+  modal.onclick = function(e){ if (e.target===modal) closeSlipModal(); };
+  document.getElementById("slipClose").onclick = closeSlipModal;
+  const withBlob = function(fn){ canvas.toBlob(function(blob){ if (blob) fn(blob); else toast("Impossible de générer l'image."); }, "image/png"); };
+  document.getElementById("slipDownload").onclick = function(){
+    const a = document.createElement("a"); a.href = url; a.download = "betia-prono.png";
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+  if (canShareFiles) document.getElementById("slipShare").onclick = function(){
+    withBlob(function(blob){
+      const file = new File([blob], "betia-prono.png", { type:"image/png" });
+      if (!navigator.canShare({ files:[file] })) { toast("Partage d'image non disponible : utilise Télécharger."); return; }
+      navigator.share({ files:[file], title:"Mon prono BetIA" }).catch(function(){});
+    });
+  };
+  if (canCopy) document.getElementById("slipCopy").onclick = function(){
+    withBlob(function(blob){
+      navigator.clipboard.write([new ClipboardItem({ "image/png": blob })])
+        .then(function(){ toast("Image copiée dans le presse-papier."); })
+        .catch(function(){ toast("Copie refusée par le navigateur : utilise Télécharger."); });
+    });
+  };
+}
+
 function renderHome(){
   const stats = computeTodayStats();
   const el = document.getElementById("pageHome");
   el.innerHTML = '<section class="hero">'
       + '<img class="hero-photo" src="'+HERO_PHOTO_DATA_URI+'" alt="BetIA">'
-      + '<p class="hero-tag">Analyse statistique Dixon-Coles, probabilités réelles et détection des meilleures cotes ANJ (Winamax, Betclic, Unibet) — jamais l\'inverse : la probabilité n\'est jamais déduite de la cote.</p>'
+      + '<p class="hero-tag">Probabilités tirées des cotes réelles de Winamax, Betclic et Unibet, ajustées par la forme, le repos et les face-à-face quand ces stats sont disponibles.</p>'
     + '</section>'
     + '<div class="kpi-row">'
       + kpiHtml(stats.matches, "matchs analysés aujourd'hui")
@@ -2877,6 +3551,7 @@ function renderHome(){
     + '</div>'
     + perfChartSectionHtml()
     + renderChallengeWidget()
+    + radarWidgetHtml()
     + '<section class="home-section"><h2>Les 3 coups sûrs du jour</h2>'
       + (stats.topFavoris.length
           ? '<div class="opp-list">' + stats.topFavoris.map(function(x){ return favoriRowHtml(x.sel, x.match); }).join("") + '</div>'
@@ -2890,7 +3565,7 @@ function renderHome(){
     + '</section>'
     + '<section class="home-section"><h2>Comment ça marche</h2>'
       + '<div class="info-row">'
-        + infoCardHtml(1, "Calcul pur stats", "Dixon-Coles / Poisson pour le foot, simulation point par point pour le tennis — jamais à partir des cotes.")
+        + infoCardHtml(1, "Probabilités du marché + stats", "Cotes des trois opérateurs, marge retirée, puis ajustées par la forme, le repos et les confrontations (API-Football) quand elles sont disponibles.")
         + infoCardHtml(2, "Comparaison des cotes", "La probabilité du modèle est confrontée à la cote plancher et à la meilleure cote ANJ du moment.")
         + infoCardHtml(3, "Mise proportionnelle à la confiance", "2 % de la bankroll si proba ≥ 72 %, 4 % si proba ≥ 80 % — pour le prono sécurisé. Les values indicatives restent en Kelly.")
       + '</div>'
@@ -3061,6 +3736,7 @@ function renderJournalPage(){
   });
   bindManualResultButtons(el);
   bindComboButtons(el);
+  bindSlipButtons(el);
   const notifBtn = document.getElementById("enableNotifBtn");
   if (notifBtn) notifBtn.onclick = requestNotificationPermission;
   renderJournalStatsCharts();
@@ -3149,20 +3825,31 @@ function marketMarginsFromH2h(h2hSel){
 
 // Mise du Prono Sécurisé, séparée des values indicatives (Kelly) juste en dessous — mise proportionnelle
 // à la confiance, jamais Kelly, pour la recommandation principale.
+// Le bouton de carte de prono est TOUJOURS présent, quel que soit le statut du match (à venir, en direct,
+// terminé, annulé). Seuls la mise conseillée et le bouton Combiné disparaissent une fois le match verrouillé,
+// puisqu'on ne peut plus y parier.
+const SLIP_BTN_HTML = '<button class="slip-btn" id="slipMatchBtn">📸 Générer la carte de prono</button>';
 function securePickStakeHtml(m){
-  if (isMatchLocked(m)) return "";
   const secure = securePickOf(m);
-  if (!secure) return ""; // cas dégénéré : aucune sélection h2h du tout
-  if (secure.secureLevel!=="secure") {
+  if (!secure) return '<div class="kelly-item tnum"><div class="left">'+SLIP_BTN_HTML+'</div></div>';
+  const isSecure = secure.secureLevel==="secure";
+  if (isMatchLocked(m)) {
+    const st = matchStatus(m)==="cancelled" ? "Match annulé" : "Match terminé";
+    return '<div class="kelly-item tnum '+(isSecure?"secure":"lean")+'"><div class="left">'+(isSecure?"🟢 ":"🟠 ")+secure.label+' — '+fmtPct(secure.pModel)
+        + '<br><span style="color:var(--haze)">'+st+' : cotes verrouillées, plus de mise possible.</span>'
+        + '<br>'+SLIP_BTN_HTML+'</div>'
+      + '<div class="stake"><b>—</b><br><span class="frac">Mise</span></div></div>';
+  }
+  if (!isSecure) {
     return '<div class="kelly-item tnum lean"><div class="left">🟠 '+secure.label+' — '+fmtPct(secure.pModel)
         + '<br><span style="color:var(--haze)">Confiance insuffisante pour miser (&lt; 72 %)</span>'
-        + '<br><button class="combo-add-btn" data-combo-add="'+m.id+'">+ Combiné</button></div>'
+        + '<br><button class="combo-add-btn" data-combo-add="'+m.id+'">+ Combiné</button> '+SLIP_BTN_HTML+'</div>'
       + '<div class="stake"><b>0 €</b><br><span class="frac">Mise conseillée</span></div></div>';
   }
   const frac = secureStakeFraction(secure.pModel);
   return '<div class="kelly-item tnum secure"><div class="left">🟢 '+secure.label+' — '+fmtPct(secure.pModel)
       + '<br><span style="color:var(--haze)">Mise proportionnelle à la confiance (2 % si proba ≥ 72 %, 4 % si proba ≥ 80 %)</span>'
-      + '<br><button class="combo-add-btn" data-combo-add="'+m.id+'">+ Combiné</button></div>'
+      + '<br><button class="combo-add-btn" data-combo-add="'+m.id+'">+ Combiné</button> '+SLIP_BTN_HTML+'</div>'
     + '<div class="stake"><b>'+fmtEur(state.bankroll*frac)+'</b><br><span class="frac">('+fmtPct(frac)+')</span></div></div>';
 }
 function kellySectionHtml(m){
@@ -3370,6 +4057,7 @@ function drawerHtml(m){
     + generateCoachAnalysis(m)
     + tabsBarHtml(drawerTab, "drawer", sport, m)
     + '<div id="drawerBody">' + drawerBodyHtml(m) + '</div>'
+    + whatIfHtml(m)
     + oddsComparatorHtml(m)
     + stakeCalculatorHtml(m)
     + manualResultButtonsHtml(m)
@@ -3378,6 +4066,9 @@ function drawerHtml(m){
 
 function bindDrawerEvents(m){
   bindStakeCalculator(m);
+  bindWhatIf(m);
+  const slipBtn = document.getElementById("slipMatchBtn");
+  if (slipBtn) slipBtn.onclick = function(){ openSlipModal(slipDataForMatch(m)); };
   // Trois façons fluides de revenir à la grille : la croix, le bouton "Retour" en haut, et sa version
   // sticky en bas — la grille elle-même n'a jamais bougé pendant que le drawer était ouvert, donc fermer
   // suffit à retrouver exactement le même point de défilement.
@@ -3400,6 +4091,7 @@ function bindDrawerEvents(m){
   bindTrackButtons(document.getElementById("drawer"));
   bindManualResultButtons(document.getElementById("drawer"));
   bindComboButtons(document.getElementById("drawer"));
+  bindSlipButtons(document.getElementById("drawer"));
 }
 
 function refreshDrawer(){
@@ -3592,6 +4284,7 @@ document.getElementById("refreshBtn").onclick = function(e){
   renderActivePage(true);
 };
 
+document.addEventListener("keydown", function(e){ if (e.key==="Escape") closeSlipModal(); });
 renderComboBar();
 switchTab("home");
 </script>
