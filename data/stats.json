@@ -1,1 +1,1 @@
-{"generatedAt":"2026-11-02T12:09:20.925Z","tennis":{"matches":[],"error":"api-tennis get_fixtures : \"1\"","calls":1},"football":{"matches":[],"error":"API-Football : {\"access\":\"Your account is suspended, check on https://dashboard.api-football.com.\"}","calls":1}}
+{"generatedAt":"2026-11-03T11:45:16.807Z","tennis":{"matches":[],"error":"api-tennis get_fixtures : \"1\"","calls":1},"football":{"matches":[],"error":"API-Football : {\"access\":\"Your account is suspended, check on https://dashboard.api-football.com.\"}","calls":1}}
